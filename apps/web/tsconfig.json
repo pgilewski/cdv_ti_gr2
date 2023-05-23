@@ -1,0 +1,5 @@
+{
+  "extends": "tsconfig-techint/vite.json",
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

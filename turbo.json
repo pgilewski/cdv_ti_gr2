@@ -1,0 +1,33 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "lint": {},
+    "test": {
+      "outputs": ["coverage/**"]
+    },
+    "test:watch": {
+      "cache": false
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["build/**", "dist/**"]
+    },
+    "storybook:build": {
+      "outputs": ["storybook-static/**"]
+    },
+    "web-e2e#build": {
+      "env": ["CI"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "storybook:dev": {
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    }
+  },
+  "globalDependencies": ["**/eslint-config-techint /index.js", "**/tsconfig-techint /*.json"]
+}

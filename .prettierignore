@@ -1,0 +1,9 @@
+**/build
+**/dist
+**/cdk.out
+cdk.context.json
+
+# Ignore files for NPM
+package-lock.json
+
+*.hbs

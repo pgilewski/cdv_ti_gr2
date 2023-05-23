@@ -1,0 +1,20 @@
+import * as cdk from 'aws-cdk-lib';
+
+import { {{pascalCase name}}StackProps } from '../stacks';
+
+import { getProjectStackProps } from './project-stack-props';
+
+const STACK_NAME = '{{pascalCase name}}Stack';
+
+export function get{{pascalCase name}}StackProps(stage: cdk.Stage): {{pascalCase name}}StackProps {
+  const projectProps = getProjectStackProps(stage);
+
+  const stackProps: {{pascalCase name}}StackProps = {
+    ...projectProps,
+    stackName: getStackName(project, STACK_NAME),
+    dummy: 'dummy_value',
+    // configure your stack here ...
+  };
+
+  return stackProps;
+}

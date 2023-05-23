@@ -1,0 +1,19 @@
+# Editor configuration, see http://editorconfig.org
+# Prettier config, see https://prettier.io/docs/en/configuration.html#editorconfig
+
+# Stop the editor from looking for .editorconfig files in the parent directories
+root = true
+
+[*]
+max_line_length = 120
+quote_type = single
+charset = utf-8
+indent_style = space
+indent_size = 2
+end_of_line = LF
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+max_line_length = off
+trim_trailing_whitespace = false

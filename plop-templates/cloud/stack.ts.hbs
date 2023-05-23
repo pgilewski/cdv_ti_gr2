@@ -1,0 +1,24 @@
+import * as cdk from 'aws-cdk-lib';
+
+import { ProjectStackProps } from '../props';
+
+export interface {{pascalCase name}}StackProps extends ProjectStackProps {
+  readonly dummy: string;
+  // add props here ...
+}
+
+export class {{pascalCase name}}Stack extends cdk.Stack {
+  constructor(scope: cdk.App, id: string, props: {{pascalCase name}}StackProps) {
+    super(scope, id, props);
+
+    // Resources
+    // ---------
+
+    // add resources here ...
+
+    // Outputs
+    // -------
+
+    // add outputs here ...
+  }
+}

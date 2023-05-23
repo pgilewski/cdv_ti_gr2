@@ -1,0 +1,47 @@
+import * as cdk from 'aws-cdk-lib';
+import { Template, Annotations, Match } from 'aws-cdk-lib/assertions';
+import { AwsSolutionsChecks } from 'cdk-nag';
+
+import { ExecutionEnv } from '../../props';
+import { {{pascalCase name}}Stack } from '../../stacks';
+
+const PROJECT_ID = 'my';
+const PROJECT_NAME = 'Project';
+
+const AWS_ACCOUNT = '11111111111111';
+const AWS_REGION = 'eu-central-1';
+
+describe('{{pascalCase name}}Stack', () => {
+  const app = new cdk.App();
+  const {{camelCase name}}Stack = new {{pascalCase name}}Stack(app, '{{pascalCase name}}Stack', {
+    project: {
+      id: PROJECT_ID,
+      name: PROJECT_NAME,
+      executionEnv: ExecutionEnv.DEV,
+      prefix: `${PROJECT_ID}-${PROJECT_NAME}-${ExecutionEnv.DEV}`,
+    },
+    env: {
+      account: AWS_ACCOUNT,
+      region: AWS_REGION,
+    },
+    dummy: 'dummy_value',
+  });
+  const template = Template.fromStack({{camelCase name}}Stack);
+  cdk.Aspects.of({{pascalCase name}}Stack).add(new AwsSolutionsChecks());
+
+  test('no unsuppressed warnings', () => {
+    const warnings = Annotations.fromStack({{camelCase name}}Stack).findWarning(
+      '*',
+      Match.stringLikeRegexp('AwsSolutions-.*')
+    );
+    expect(warnings).toHaveLength(0);
+  });
+
+  test('no unsuppressed errors', () => {
+    const errors = Annotations.fromStack({{camelCase name}}Stack).findError(
+      '*',
+      Match.stringLikeRegexp('AwsSolutions-.*')
+    );
+    expect(errors).toHaveLength(0);
+  });
+});
