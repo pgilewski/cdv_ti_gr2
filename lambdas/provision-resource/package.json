@@ -1,5 +1,5 @@
 {
-  "name": "@siili/techint-lambdas-provision-dte",
+  "name": "@cdv/techint-lambdas-provision-dte",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
-    "@siili/techint-lambdas-utils": "*"
+    "@cdv/techint-lambdas-utils": "*"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.114"

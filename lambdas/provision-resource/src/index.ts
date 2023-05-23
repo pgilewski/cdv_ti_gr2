@@ -1,5 +1,5 @@
 import { SQSHandler, SQSEvent, SQSRecord, SQSBatchItemFailure } from 'aws-lambda';
-import { logger } from '@siili/techint-lambdas-utils';
+import { logger } from '@cdv/techint-lambdas-utils';
 
 const provisionResource = (body: string) => {
   logger.info(`Provision Resource: ${body}`);

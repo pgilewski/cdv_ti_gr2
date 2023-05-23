@@ -1,5 +1,5 @@
 {
-  "name": "@siili/techint-lambdas-api",
+  "name": "@cdv/techint-lambdas-api",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -20,7 +20,7 @@
     "@nestjs/cli": "^9.4.2",
     "@nestjs/schematics": "^9.1.0",
     "@nestjs/testing": "^9.4.0",
-    "@siili/techint-utils": "*",
+    "@cdv/techint-utils": "*",
     "@types/aws-lambda": "^8.10.114"
   },
   "dependencies": {

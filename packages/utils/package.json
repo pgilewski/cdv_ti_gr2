@@ -1,5 +1,5 @@
 {
-  "name": "@siili/techint-utils",
+  "name": "@cdv/techint-utils",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.ts",

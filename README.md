@@ -1,5 +1,16 @@
 # techint
 
+## Technology stack
+
+- TypeScript
+- ReactJS
+- NestJS
+- Prisma
+- Styled Components
+- Mantine
+- AWS
+- Turbo
+
 ## Setup
 
 ### 1 .Node.js
@@ -36,7 +47,7 @@ $ npm install
 ## Monorepo overview
 
 ```
-siili-techint
+cdv-techint
 ├── apps
 │  ├── web
 │  ├── web-e2e
@@ -81,8 +92,8 @@ siili-techint
 - `npm run build` or `turbo build` - compile typescript to js
 - `npm run dev` or `turbo dev` - serve the development environment
 - `npm run clean` or `turbo clean` - clean the project (removes `node_modules`, `dist`, `.turbo`)
-- `npm run storybook:dev` or `turbo run storybook:dev` - serve the storybook environment (it will start all the Storybooks (each on a specific port)). To start only one instance, launch `turbo run storybook:dev --filter=@siili/techint-web` (`web` being the name of your workspace)
-- `npm i my-package -w apps/web` - add a dependency named `my-package` from the registry as a dependency of your workspace `apps/web` (you can also use package name like `@siili/techint-web`)
+- `npm run storybook:dev` or `turbo run storybook:dev` - serve the storybook environment (it will start all the Storybooks (each on a specific port)). To start only one instance, launch `turbo run storybook:dev --filter=@cdv/techint-web` (`web` being the name of your workspace)
+- `npm i my-package -w apps/web` - add a dependency named `my-package` from the registry as a dependency of your workspace `apps/web` (you can also use package name like `@cdv/techint-web`)
 - `npm test -w apps/web` - run all tests in `apps/web` workspace
 
 ## Generators

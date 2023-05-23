@@ -1,4 +1,4 @@
-# @siili/techint-lambdas-utils
+# @cdv/techint-lambdas-utils
 
 ## Resources
 

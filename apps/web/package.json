@@ -1,5 +1,5 @@
 {
-  "name": "@siili/techint-web",
+  "name": "@cdv/techint-web",
   "private": true,
   "version": "0.0.0",
   "scripts": {
@@ -18,7 +18,7 @@
     "@mantine/core": "^6.0.11",
     "@mantine/dates": "^6.0.11",
     "@mantine/hooks": "^6.0.11",
-    "@siili/techint-ui": "*",
+    "@cdv/techint-ui": "*",
     "@tabler/icons-react": "^2.19.0",
     "axios": "^1.4.0",
     "dayjs": "^1.11.7",

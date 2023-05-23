@@ -1,5 +1,5 @@
 {
-  "name": "@siili/techint-lambdas-utils",
+  "name": "@cdv/techint-lambdas-utils",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.ts",

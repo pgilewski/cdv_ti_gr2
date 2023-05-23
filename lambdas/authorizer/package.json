@@ -1,5 +1,5 @@
 {
-  "name": "@siili/techint-lambdas-authorizer",
+  "name": "@cdv/techint-lambdas-authorizer",
   "version": "0.0.0",
   "private": true,
   "scripts": {
