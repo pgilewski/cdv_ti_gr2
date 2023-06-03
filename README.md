@@ -1,5 +1,9 @@
 # techint
 
+TODO:
+
+- Make login page a default page
+
 ## Technology stack
 
 - TypeScript

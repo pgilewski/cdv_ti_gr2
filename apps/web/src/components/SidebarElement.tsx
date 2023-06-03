@@ -30,7 +30,7 @@ const StyledSidebarElement = styled.div`
 export default function SidebarElement({ children, to }: Props) {
   const theme = useMantineTheme();
   return (
-    <Link to={to}>
+    <Link to={'/app' + to}>
       <StyledDiv>
         <StyledSidebarElement theme={theme}>{children}</StyledSidebarElement>
       </StyledDiv>
