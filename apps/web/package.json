@@ -15,7 +15,6 @@
     "start": "serve dist -s -n -L -p $PORT"
   },
   "dependencies": {
-    "@cdv/techint-ui": "*",
     "@emotion/styled": "^11.11.0",
     "@mantine/core": "^6.0.11",
     "@mantine/dates": "^6.0.11",
