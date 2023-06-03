@@ -7,7 +7,7 @@ export interface MonthlyData {
   workDays: WorkDay[];
   hoursTotal: number;
   reviewed: boolean;
-  reviewedBy: string;
+  reviewedBy?: string;
   // define the structure of the data returned from the /monthly endpoint
 }
 

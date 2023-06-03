@@ -6,7 +6,6 @@ export type TaskHour = {
   startTime: string;
   endTime: string;
   duration: number;
-  note: string;
 };
 
 export type Comments = {
@@ -26,8 +25,8 @@ export type WorkDay = {
   createdAt: string;
   updatedAt: string;
   hours: TaskHour[];
-  isReviewed: boolean;
-  revievedBy: string;
+  isReviewed?: boolean;
+  reviewedBy?: number;
   comments: Comments[];
 };
 
@@ -59,11 +58,11 @@ export type Project = {
   tasks: Task[];
 };
 
-export type CurrentUser = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: 'admin' | 'manager' | 'employee';
-  token: string;
-};
+// export type CurrentUser = {
+//   id: number;
+//   firstName: string;
+//   lastName: string;
+//   email: string;
+//   role: 'admin' | 'manager' | 'employee';
+//   token: string;
+// };

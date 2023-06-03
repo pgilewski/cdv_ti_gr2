@@ -10,15 +10,13 @@ import { outputParameter } from '../utils';
 import { SecureBucket } from '../constructs';
 
 export interface CloudFrontDistributionStackProps extends ProjectStackProps {
-  httpApi: apigwv2.HttpApi;
-  environment: { [key: string]: string };
+  logRetention: cdk.aws_logs.RetentionDays;
 }
 export class CloudFrontDistributionStack extends cdk.Stack {
   public readonly distribution: cloudfront.Distribution;
 
   constructor(scope: cdk.App, id: string, props: CloudFrontDistributionStackProps) {
     super(scope, id, props);
-    const { environment } = props;
 
     // Resources
     // ---------

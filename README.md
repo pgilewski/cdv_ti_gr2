@@ -10,6 +10,7 @@
 - Mantine
 - AWS
 - Turbo
+- Convencional Commits
 
 ## Setup
 

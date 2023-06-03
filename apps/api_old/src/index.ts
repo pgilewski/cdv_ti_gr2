@@ -12,7 +12,9 @@ async function bootstrap(): Promise<Handler> {
   const app = await NestFactory.create(AppModule, {
     logger: !env.AWS_EXECUTION_ENV ? new Logger() : console,
   });
-  app.setGlobalPrefix(env.API_PREFIX);
+  // app.setGlobalPrefix(env.API_PREFIX);
+  app.setGlobalPrefix('api');
+
   app.enableCors();
 
   await app.init();

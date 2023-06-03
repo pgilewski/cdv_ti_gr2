@@ -11,14 +11,15 @@
     "dev": "vite",
     "storybook:dev": "storybook dev -p 6006",
     "preview": "vite preview",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "start": "serve dist -s -n -L -p $PORT"
   },
   "dependencies": {
+    "@cdv/techint-ui": "*",
     "@emotion/styled": "^11.11.0",
     "@mantine/core": "^6.0.11",
     "@mantine/dates": "^6.0.11",
     "@mantine/hooks": "^6.0.11",
-    "@cdv/techint-ui": "*",
     "@tabler/icons-react": "^2.19.0",
     "axios": "^1.4.0",
     "dayjs": "^1.11.7",
@@ -28,7 +29,8 @@
     "react-hook-form": "^7.43.9",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.11.2",
-    "react-select": "^5.7.3"
+    "react-select": "^5.7.3",
+    "serve": "^14.2.0"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^7.0.6",

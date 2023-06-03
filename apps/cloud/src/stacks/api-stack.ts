@@ -9,6 +9,8 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import { CfnStage } from 'aws-cdk-lib/aws-apigatewayv2';
@@ -23,9 +25,15 @@ export interface ApiStackProps extends ProjectStackProps {
 
 export class ApiStack extends cdk.Stack {
   public readonly httpApi: apigwv2.HttpApi;
+  public readonly apiSecurityGroup: ec2.SecurityGroup;
 
   constructor(scope: cdk.App, id: string, props: ApiStackProps) {
     super(scope, id, props);
+
+    // const vpcId = ssm.StringParameter.valueFromLookup(this, '/techint-dev/techint-dev-VpcStack/VpcId');
+    const vpc = ec2.Vpc.fromLookup(this, 'VPC', {
+      vpcId: 'vpc-0c8ddc715085f5c84',
+    });
 
     // Resource
     // --------
@@ -142,6 +150,11 @@ export class ApiStack extends cdk.Stack {
     });
     this.enableAccessLogging(this.httpApi, cdk.aws_logs.RetentionDays.ONE_WEEK);
 
+    this.apiSecurityGroup = new ec2.SecurityGroup(this, 'ApiSecurityGroup', {
+      vpc: vpc, // assuming your VPC is defined as myVpc
+      description: 'Security group for the API',
+      allowAllOutbound: true, // change to your needs
+    });
     // Nag Suppresions
     // ---------------
 
@@ -221,6 +234,7 @@ export class ApiStack extends cdk.Stack {
 
     outputParameter(this, props.project, 'HttpApiEndpoint', this.httpApi.apiEndpoint);
     outputParameter(this, props.project, 'HttpApiId', this.httpApi.apiId);
+    outputParameter(this, props.project, 'ApiSecurityGroupId', this.apiSecurityGroup.securityGroupId);
   }
 
   enableAccessLogging(api: apigwv2.HttpApi, retention: cdk.aws_logs.RetentionDays) {

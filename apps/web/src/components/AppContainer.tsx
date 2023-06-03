@@ -10,6 +10,7 @@ const HeaderText = styled.div`
   text-align: center;
   font-family: monospace;
 `;
+
 interface AppContainerProps {
   children: React.ReactNode;
 }
@@ -17,6 +18,7 @@ interface AppContainerProps {
 export const AppContainer = ({ children }: AppContainerProps) => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
+
   return (
     <AppShell
       styles={{

@@ -9,7 +9,7 @@ import { getProjectStackProps } from './project-stack-props';
 
 const STACK_NAME = 'CloudFrontDistributionStack';
 
-export function getCloudFrontDistributionStackProps(stage: cdk.Stage): CloudFrontDistributionStackProps {
+export function getWebPipelineStackProps(stage: cdk.Stage, httpApi: apigwv2.HttpApi): CloudFrontDistributionStackProps {
   const projectProps = getProjectStackProps(stage);
   const { project } = projectProps;
 
