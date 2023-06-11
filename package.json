@@ -50,5 +50,8 @@
       "path": "cz-conventional-changelog"
     }
   },
-  "packageManager": "npm@9.6.4"
+  "packageManager": "npm@9.6.4",
+  "dependencies": {
+    "node-modules": "^0.0.1"
+  }
 }

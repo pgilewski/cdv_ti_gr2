@@ -1,4 +1,10 @@
 {
+  "compilerOptions": {
+    "jsx": "react"
+  },
+  "compilerOptions": {
+    "jsx": "react"
+  },
   "extends": "tsconfig-techint/vite.json",
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
