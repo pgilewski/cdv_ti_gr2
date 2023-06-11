@@ -1,6 +1,6 @@
 import { Table } from '@mantine/core';
 
-import { MonthlyData } from '../../../hooks/useMonthlyData';
+import { MonthlyData } from '../../../hooks/useMonthlyDataHandler';
 
 export const MonthlyTable = ({ data }: { data: MonthlyData }) => {
   const elements = [{ position: 1, name: 'Hydrogen', symbol: 'H', mass: 1.0079 }];

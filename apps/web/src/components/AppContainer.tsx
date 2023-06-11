@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { AppShell, Navbar, Header, Footer, Aside, Text, MediaQuery, Burger, useMantineTheme } from '@mantine/core';
 import styled from '@emotion/styled';
+import { Outlet } from 'react-router-dom';
+
+import useAuth from '../hooks/useAuth';
 
 import SidebarElement from './SidebarElement';
 
@@ -11,14 +14,10 @@ const HeaderText = styled.div`
   font-family: monospace;
 `;
 
-interface AppContainerProps {
-  children: React.ReactNode;
-}
-
-export const AppContainer = ({ children }: AppContainerProps) => {
+export const AppContainer = () => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
-
+  const { signOut } = useAuth();
   return (
     <AppShell
       styles={{
@@ -34,6 +33,7 @@ export const AppContainer = ({ children }: AppContainerProps) => {
           <SidebarElement to="/daily">Rejestr dzienny</SidebarElement>
           <SidebarElement to="/monthly">Rejestr miesięczny</SidebarElement>
           <SidebarElement to="/users">Użytkownicy</SidebarElement>
+          <SidebarElement to="/projects">Projekty i taski</SidebarElement>
         </Navbar>
       }
       // aside={
@@ -69,13 +69,13 @@ export const AppContainer = ({ children }: AppContainerProps) => {
             </MediaQuery>
             <HeaderText>📝 Rejestr godzin 📝</HeaderText>
             <div>
-              <Text>Wyloguj</Text>
+              <Text onClick={signOut}>Wyloguj</Text>
             </div>
           </div>
         </Header>
       }
     >
-      {children}
+      <Outlet />
     </AppShell>
   );
 };

@@ -4,7 +4,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
-import { useMonthlyData } from '../../../hooks/useMonthlyData';
+import { useMonthlyData } from '../../../hooks/useMonthlyDataHandler';
 import ReviewDayButton from '../ReviewDayButton';
 
 import { MonthlyTable } from './MonthlyTable';

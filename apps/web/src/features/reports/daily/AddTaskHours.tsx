@@ -1,18 +1,26 @@
-import { Button, Flex, Grid, Table, Title, Modal, Group, Text, Select, TextInput, Container } from '@mantine/core';
-import { useMutation, useQuery } from 'react-query';
-import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
-import ReactDatePicker from 'react-datepicker';
-import { Controller, useForm } from 'react-hook-form';
-import ReactSelect from 'react-select';
+import {
+  Button,
+  Flex,
+  Grid,
+  Table,
+  Title,
+  Modal,
+  Group,
+  Text,
+  Select,
+  TextInput,
+  Container,
+  UnstyledButton,
+} from '@mantine/core';
 import styled from '@emotion/styled';
+import { useMediaQuery } from '@mantine/hooks';
+import { Controller, useForm } from 'react-hook-form';
+import { useMutation, useQuery } from 'react-query';
+import { useSearchParams } from 'react-router-dom';
+import ReactDatePicker from 'react-datepicker';
+import ReactSelect from 'react-select';
 
-import { Task, TaskHour } from '../../../typings/types';
-import { ChangeDayNavbar } from '../ChangeDayNavbar';
-import ReviewDayButton from '../ReviewDayButton';
-import 'react-datepicker/dist/react-datepicker.css';
-import useWorkDayManagement from '../../../hooks/useWorkDayManagement';
+import { Task, TaskHour, WorkDay } from '../../../typings/types';
 
 const SpaceForModal = styled.div`
   padding-bottom: 8rem;
@@ -26,7 +34,7 @@ type AddTaskHoursModalProps = {
   onClose: () => void;
 };
 
-const AddTaskHoursModal = ({ isOpen, onClose }: AddTaskHoursModalProps) => {
+export const AddTaskHoursModal = ({ isOpen, onClose }: AddTaskHoursModalProps) => {
   const { register, handleSubmit, control, watch, reset } = useForm();
   const [searchParams] = useSearchParams();
   const userId = searchParams.get('user') || undefined;
@@ -189,85 +197,4 @@ async function submitData(data: any) {
     console.error('Error submitting task hours data:', error);
     throw error;
   }
-}
-
-type DailyTable = {
-  data: any;
-  setTable: React.Dispatch<React.SetStateAction<any>>;
-};
-
-const DailyTable = ({ data, setTable }: DailyTable) => {
-  const elements = [
-    { position: 6, mass: 12.011, symbol: 'C', name: 'Carbon' },
-    { position: 7, mass: 14.007, symbol: 'N', name: 'Nitrogen' },
-  ];
-  const ths = (
-    <tr>
-      <th>Godziny</th>
-      <th>Task</th>
-      <th>Notatka</th>
-      <th>Akcje</th>
-    </tr>
-  );
-
-  const rows = elements.map((element) => (
-    <tr key={element.name}>
-      <td>{element.position}</td>
-      <td>{element.name}</td>
-      <td>{element.symbol}</td>
-      <td>{element.mass}</td>
-    </tr>
-  ));
-  return (
-    <Table highlightOnHover>
-      <caption></caption>
-      <thead>{ths}</thead>
-      <tbody>{rows}</tbody>
-      <tfoot>{ths}</tfoot>
-    </Table>
-  );
-};
-
-export default function DailyPage() {
-  // take from url params day and month and year and fetch data
-
-  // const params = useParams<DailyPageParams>();
-  const [searchParams] = useSearchParams();
-
-  const { workDayQuery, createWorkDayMutation, updateWorkDayMutation, deleteWorkDayMutation } = useWorkDayManagement({
-    userId: searchParams.get('user') || undefined,
-    day: searchParams.get('day') || undefined,
-  });
-
-  console.log(searchParams);
-
-  const [opened, { open, close }] = useDisclosure(false);
-  const [date, setDate] = useState<Date | null>(new Date());
-  const [table, setTable] = useState<any>([]);
-  return (
-    <div>
-      <Title>Daily raport</Title>
-      <Grid m="0">
-        <Grid.Col span="auto">{/* <RaportOwnerHeading /> */}</Grid.Col>
-        <Grid.Col span={6}>
-          <ChangeDayNavbar date={date} setDate={setDate} />
-        </Grid.Col>
-
-        <Grid.Col span="auto">
-          <Flex justify={'end'}>
-            <ReviewDayButton reviewed={true} canEdit={true} />
-          </Flex>
-        </Grid.Col>
-      </Grid>
-
-      <AddTaskHoursModal isOpen={opened} onClose={close} />
-      <Flex justify={'center'}>
-        <Button color="blue" onClick={open}>
-          Add hours
-        </Button>
-      </Flex>
-
-      {/* <DailyTable setTable={setTable} data={dailyData} /> */}
-    </div>
-  );
 }

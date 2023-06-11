@@ -6,6 +6,9 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import SidebarElement from './components/SidebarElement';
 import { AppContainer } from './components/AppContainer';
 import AppRoutes from './components/AppRoutes';
+import AuthProvider from './features/auth/AuthProvider';
+import { ApiProvider } from './features/ApiProvider';
+import { NotyfProvider } from './hooks/useNotyf';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,7 +22,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AppRoutes />
+        <AuthProvider>
+          <ApiProvider>
+            <AppRoutes />
+          </ApiProvider>
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );
