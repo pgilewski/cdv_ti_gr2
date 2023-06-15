@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PasswordInput, TextInput, Flex, Button } from '@mantine/core';
+import { PasswordInput, TextInput, Flex, Button, Stack } from '@mantine/core';
 
 export default function LoginPage() {
 type LoginProps = {
@@ -20,33 +20,33 @@ function onLogin(email: string, password: string) {
 //}
 
   return (
-    <div>
-          <Flex
-      mih={200}
-      bg="transparent"
-      gap="md"
-      justify="center"
-      align="center"
-      direction="column"
-      wrap="wrap"
-    >
-      <TextInput         
+    <Flex
+    mih={50}
+    bg="rgba(0, 0, 0, 0)"
+    gap="xl"
+    justify="center"
+    align="center"
+    direction="column"
+    wrap="wrap"
+  >
+    <Stack>
+      <TextInput                 
           value={email}
           label="Email"
           placeholder="Enter your email"
           withAsterisk
           onChange={(e) => setEmail(e.target.value)}
         />
-        <PasswordInput
+        <PasswordInput               
           value={password}
           label="Password"
           placeholder="Enter your password"
           withAsterisk
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button onClick={handleLogin}>Login</Button>
+    </Stack>
+    <Button onClick={handleLogin}>Login</Button>
     </Flex>
-    </div>
   );
 };
 

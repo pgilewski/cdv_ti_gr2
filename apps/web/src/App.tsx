@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AppShell, Navbar, Header, Footer, Aside, Text, MediaQuery, Burger, useMantineTheme } from '@mantine/core';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import React from 'react';
 
 import SidebarElement from './components/SidebarElement';
 import { AppContainer } from './components/AppContainer';
