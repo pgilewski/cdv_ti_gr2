@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { Text, useMantineTheme } from '@mantine/core';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 interface Props {

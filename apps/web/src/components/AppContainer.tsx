@@ -3,6 +3,7 @@ import { AppShell, Navbar, Header, Footer, Aside, Text, MediaQuery, Burger, useM
 import styled from '@emotion/styled';
 
 import SidebarElement from './SidebarElement';
+import React from 'react';
 
 const HeaderText = styled.div`
   font-size: 1.25 rem;

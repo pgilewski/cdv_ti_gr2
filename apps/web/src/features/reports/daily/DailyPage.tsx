@@ -13,6 +13,7 @@ import { Task, TaskHour } from '../../../types';
 import { ChangeDayNavbar } from '../ChangeDayNavbar';
 import ReviewDayButton from '../ReviewDayButton';
 import 'react-datepicker/dist/react-datepicker.css';
+import React from 'react';
 
 const SpaceForModal = styled.div`
   padding-bottom: 8rem;

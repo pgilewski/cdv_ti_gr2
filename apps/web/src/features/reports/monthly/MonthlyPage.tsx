@@ -8,6 +8,7 @@ import { useMonthlyData } from '../../../hooks/useMonthlyData';
 import ReviewDayButton from '../ReviewDayButton';
 
 import { MonthlyTable } from './MonthlyTable';
+import React from 'react';
 
 export default function MonthlyPage() {
   const [searchParams] = useSearchParams();
