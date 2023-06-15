@@ -29,9 +29,12 @@
     "react-datepicker": "^4.11.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.9",
+    "react-loader-spinner": "^5.3.4",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.11.2",
     "react-select": "^5.7.3",
+    "react-spinkit": "^3.0.0",
+    "react-spinners": "^0.13.8",
     "serve": "^14.2.0"
   },
   "devDependencies": {
@@ -48,6 +51,7 @@
     "@types/react": "^18.0.26",
     "@types/react-datepicker": "^4.11.2",
     "@types/react-dom": "^18.0.11",
+    "@types/react-spinkit": "^3.0.7",
     "@vitejs/plugin-react": "^3.1.0",
     "identity-obj-proxy": "^3.0.0",
     "jest-environment-jsdom": "^29.5.0",

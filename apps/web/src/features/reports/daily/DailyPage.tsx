@@ -1,18 +1,23 @@
 import { Button, Flex, Grid, Table, Title, Modal, Group, Text, Select, TextInput, Container } from '@mantine/core';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, UseMutationResult, useQuery, useQueryClient } from 'react-query';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import ReactDatePicker from 'react-datepicker';
 import { Controller, useForm } from 'react-hook-form';
 import ReactSelect from 'react-select';
 import styled from '@emotion/styled';
 
-import { Task, TaskHour } from '../../../typings/types';
+import { Task, TaskHour, WorkDay } from '../../../typings/types';
 import { ChangeDayNavbar } from '../ChangeDayNavbar';
 import ReviewDayButton from '../ReviewDayButton';
 import 'react-datepicker/dist/react-datepicker.css';
-import useWorkDayManagement from '../../../hooks/useWorkDayManagement';
+import useWorkDayManagement, { CreateWorkDayDto } from '../../../hooks/useWorkDayManagement';
+import useAuth from '../../../hooks/useAuth';
+import dayjs from 'dayjs';
+import ButtonWithLoading from '../../../components/ButtonWithLoading';
+import { formatDate } from '../../utils';
+import { AddTaskHoursModal } from './AddTaskHours';
 
 const SpaceForModal = styled.div`
   padding-bottom: 8rem;
@@ -24,183 +29,17 @@ const SelectInputContainer = styled.div`
 type AddTaskHoursModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  workDay: WorkDay;
 };
-
-const AddTaskHoursModal = ({ isOpen, onClose }: AddTaskHoursModalProps) => {
-  const { register, handleSubmit, control, watch, reset } = useForm();
-  const [searchParams] = useSearchParams();
-  const userId = searchParams.get('user') || undefined;
-
-  const { data: tasks, isLoading } = useQuery<Task[], Error>(['tasks', userId], () => fetchTasksForUser(userId));
-
-  const mutation = useMutation(submitData, {
-    onSuccess: () => {
-      reset();
-      onClose();
-    },
-  });
-
-  const onSubmit = (data: any) => {
-    console.log(data);
-    mutation.mutate(data);
-  };
-
-  const startDate = watch('startDate');
-  const endDate = watch('endDate');
-
-  const isMobile = useMediaQuery('(max-width: 50em)');
-
-  // if (isLoading) {
-  //   console.log('isOpen', isOpen);
-
-  //   return <div>Loading...</div>;
-  // }
-
-  // if (!tasks) {
-  //   return <div>No tasks found</div>;
-  // }
-
-  const taskOptions = tasks?.map((task) => ({
-    value: task.id,
-    label: task.name,
-  }));
-
-  return (
-    <Modal size={'xl'} opened={isOpen} onClose={onClose} title="" fullScreen={isMobile} centered>
-      <SpaceForModal>
-        <Text size="xl" weight={700}>
-          Add task hours
-        </Text>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Flex className="" gap={'sm'} justify={'space-evenly'}>
-            <div>
-              <label htmlFor="startDate">Start Date:</label>
-              <Controller
-                name="startDate"
-                control={control}
-                rules={{ required: 'This field is required' }}
-                render={({ field }) => (
-                  <ReactDatePicker
-                    autoComplete="off"
-                    selected={field.value}
-                    onChange={(date) => field.onChange(date)}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={15}
-                    timeCaption="Time"
-                    dateFormat="HH:mm"
-                    timeFormat="HH:mm"
-                  />
-                )}
-              />
-            </div>
-            <div>
-              <label htmlFor="endDate">End Date:</label>
-              <Controller
-                name="endDate"
-                control={control}
-                rules={{ required: 'This field is required' }}
-                render={({ field }) => (
-                  <ReactDatePicker
-                    autoComplete="off"
-                    id="endDate"
-                    selected={field.value}
-                    onChange={(date) => field.onChange(date)}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={15}
-                    timeCaption="Time"
-                    dateFormat="HH:mm"
-                    timeFormat="HH:mm"
-                  />
-                )}
-              />
-            </div>
-          </Flex>
-
-          <SelectInputContainer>
-            <div>
-              <label htmlFor="task">Task:</label>
-              <Controller
-                name="taskId"
-                control={control}
-                rules={{ required: 'This field is required' }}
-                render={({ field }) => (
-                  <ReactSelect
-                    id="task"
-                    inputId="task"
-                    value={taskOptions?.find((option) => option.value === field.value)}
-                    options={isLoading ? [] : taskOptions}
-                    isLoading={isLoading}
-                    isDisabled={isLoading}
-                    placeholder={isLoading ? 'Loading...' : 'Select a task'}
-                    onChange={(option) => field.onChange(option?.value)}
-                  />
-                )}
-              />
-            </div>
-            <div>
-              <TextInput id="note" placeholder="Co robiles..." label="Note" {...register('note')} autoComplete="off" />
-            </div>
-          </SelectInputContainer>
-          <button type="submit">Submit</button>
-        </form>
-      </SpaceForModal>
-    </Modal>
-  );
-};
-async function fetchTasksForUser(userId?: string) {
-  if (!userId) {
-    throw new Error('User ID is required');
-  }
-
-  try {
-    const response = await fetch(`/api/tasks?userId=${userId}`);
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch tasks');
-    }
-
-    const tasks = await response.json();
-    return tasks as Task[];
-  } catch (error) {
-    console.error('Error fetching tasks:', error);
-    throw error;
-  }
-}
-
-async function submitData(data: any) {
-  try {
-    const response = await fetch('/api/task-hours', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit task hours data');
-    }
-
-    const taskHour = await response.json();
-    return taskHour as TaskHour;
-  } catch (error) {
-    console.error('Error submitting task hours data:', error);
-    throw error;
-  }
-}
 
 type DailyTable = {
-  data: any;
-  setTable: React.Dispatch<React.SetStateAction<any>>;
+  data: WorkDay;
+  setWorkDay: React.Dispatch<React.SetStateAction<any>>;
 };
 
-const DailyTable = ({ data, setTable }: DailyTable) => {
-  const elements = [
-    { position: 6, mass: 12.011, symbol: 'C', name: 'Carbon' },
-    { position: 7, mass: 14.007, symbol: 'N', name: 'Nitrogen' },
-  ];
+const TaskHoursTable = ({ data, setWorkDay }: DailyTable) => {
+  const [opened, { open, close }] = useDisclosure(false);
+
   const ths = (
     <tr>
       <th>Godziny</th>
@@ -209,41 +48,120 @@ const DailyTable = ({ data, setTable }: DailyTable) => {
       <th>Akcje</th>
     </tr>
   );
-
-  const rows = elements.map((element) => (
-    <tr key={element.name}>
-      <td>{element.position}</td>
-      <td>{element.name}</td>
-      <td>{element.symbol}</td>
-      <td>{element.mass}</td>
-    </tr>
-  ));
+  console.log(data);
+  // const rows = data.hours.map((taskHour) => (
+  //   <tr key={taskHour.id}>
+  //     <td>{taskHour.startTime}</td>
+  //     <td>{taskHour.endTime}</td>
+  //     <td>{taskHour.duration}</td>
+  //     <td>{taskHour.task.name}</td>
+  //     <td>{taskHour.task.project.title}</td>
+  //   </tr>
+  // ));
   return (
-    <Table highlightOnHover>
-      <caption></caption>
-      <thead>{ths}</thead>
-      <tbody>{rows}</tbody>
-      <tfoot>{ths}</tfoot>
-    </Table>
+    <Flex direction={'column'} justify={'center'}>
+      <Flex>
+        <Text size="lg" weight={600}>
+          Updated at:
+        </Text>
+        <Text ml={'4px'} size="lg">
+          {formatDate(data.updatedAt)}
+        </Text>
+      </Flex>
+      <AddTaskHoursModal workDay={data} isOpen={opened} onClose={close} />
+
+      <Flex justify={'center'}>
+        <Button color="blue" onClick={open}>
+          Add hours
+        </Button>
+      </Flex>
+
+      <Table highlightOnHover>
+        <caption></caption>
+        <thead>{ths}</thead>
+        {/* <tbody>{rows}</tbody> */}
+        <tfoot>{ths}</tfoot>
+      </Table>
+    </Flex>
   );
 };
 
-export default function DailyPage() {
-  // take from url params day and month and year and fetch data
+const AddDailyData = ({
+  userId,
+  date,
+  createWorkDayMutation,
+  setWorkDay,
+}: {
+  userId: string;
+  date: string;
+  createWorkDayMutation: UseMutationResult<WorkDay, Error, CreateWorkDayDto, unknown>;
+  setWorkDay: React.Dispatch<React.SetStateAction<any>>;
+}) => {
+  const queryClient = useQueryClient();
 
+  const createWorkDay = () => {
+    createWorkDayMutation.mutate(
+      {
+        userId,
+        date,
+      },
+      {
+        onSuccess: (data) => {
+          setWorkDay(data);
+          queryClient.invalidateQueries(['workDay', { userId, date }]);
+        },
+        onError: () => {
+          console.error('Error creating work day');
+        },
+      }
+    );
+  };
+
+  return (
+    <Flex justify={'center'}>
+      <ButtonWithLoading
+        loading={createWorkDayMutation.isLoading}
+        type={'button'}
+        text={'Start day'}
+        disabled={createWorkDayMutation.isLoading}
+        key={'start-day'}
+        onClick={createWorkDay}
+        color={'green'}
+      />
+    </Flex>
+  );
+};
+export default function DailyPage() {
+  const dayNow = dayjs().format('YYYY-MM-DD');
+  const { userInfo } = useAuth();
   // const params = useParams<DailyPageParams>();
   const [searchParams] = useSearchParams();
-
+  const userId = searchParams.get('user') || String(userInfo?.id);
+  const day = searchParams.get('day') || dayNow;
+  console.log(userId, day);
   const { workDayQuery, createWorkDayMutation, updateWorkDayMutation, deleteWorkDayMutation } = useWorkDayManagement({
-    userId: searchParams.get('user') || undefined,
-    day: searchParams.get('day') || undefined,
+    userId,
+    day,
   });
 
-  console.log(searchParams);
-
-  const [opened, { open, close }] = useDisclosure(false);
   const [date, setDate] = useState<Date | null>(new Date());
-  const [table, setTable] = useState<any>([]);
+  const [workDay, setWorkDay] = useState<WorkDay | null>(null);
+
+  useEffect(() => {
+    if (workDayQuery?.data && workDayQuery.data[0]) {
+      console.log('workDayQuery.data[0]', workDayQuery.data[0]);
+      setWorkDay(workDayQuery.data[0]);
+    } else {
+      setWorkDay(null);
+    }
+  }, [workDayQuery.data]);
+
+  if (workDayQuery.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  const hasWorkDay = workDay !== null;
+  console.log(workDay);
   return (
     <div>
       <Title>Daily raport</Title>
@@ -260,11 +178,17 @@ export default function DailyPage() {
         </Grid.Col>
       </Grid>
 
-      <AddTaskHoursModal isOpen={opened} onClose={close} />
-      <Flex justify={'center'}>
-        <Button color="blue" onClick={open}>
-          Add hours
-        </Button>
+      <Flex justify={'center'} direction={'column'}>
+        {hasWorkDay ? (
+          <TaskHoursTable setWorkDay={setWorkDay} data={workDay} />
+        ) : (
+          <AddDailyData
+            createWorkDayMutation={createWorkDayMutation}
+            setWorkDay={setWorkDay}
+            date={day}
+            userId={userId}
+          />
+        )}
       </Flex>
 
       {/* <DailyTable setTable={setTable} data={dailyData} /> */}

@@ -70,6 +70,21 @@ export default function ProjectsPage() {
       },
     });
   };
+
+  const onViewProject = (projectId: number) => {
+    if (!tasks) return null;
+
+    const projectToEdit = projects.find((task) => task.id === projectId);
+    if (projectToEdit) {
+      setActiveProjectId(projectId);
+      resetProjectForm({
+        title: projectToEdit.title,
+        description: projectToEdit.description,
+      });
+    }
+    // setActiveProjectId(projectId);
+  };
+
   const rows = projects.map((project) => (
     <tr key={project.id}>
       <th>{project.title}</th>
@@ -78,7 +93,7 @@ export default function ProjectsPage() {
         <Button onClick={() => deleteProject(project.id)} color="red">
           Delete
         </Button>
-        <Button onClick={() => setActiveProjectId(project.id)}>View</Button>
+        <Button onClick={() => onViewProject(project.id)}>View</Button>
       </th>
     </tr>
   ));
@@ -90,7 +105,6 @@ export default function ProjectsPage() {
         {
           onSuccess: () => {
             notyf.success('Project updated successfully!');
-            resetProjectForm();
             queryClient.invalidateQueries('projects');
           },
           onError: () => {
@@ -113,6 +127,7 @@ export default function ProjectsPage() {
   };
 
   const onTaskSubmit = (data: any) => {
+    console.log('activeTaskId', activeTaskId);
     if (activeTaskId) {
       updateTaskMutation.mutate(
         { ...data, id: activeTaskId },
@@ -167,20 +182,36 @@ export default function ProjectsPage() {
       });
     }
   };
-
+  console.log(activeProjectId);
   return (
     <Container>
-      {/* <Title order={1}>Projects and Tasks</Title>  b */}
-
       <Grid gutter={theme.spacing.md}>
         <Col span={12}>
           <Title order={2}>Projects</Title>
+          <Button
+            color={'green'}
+            onClick={() => {
+              setActiveProjectId(null);
+              resetProjectForm({
+                title: '',
+                description: '',
+              });
+            }}
+          >
+            Add Project
+          </Button>
 
           <Table>
             <thead>{ths}</thead>
             <tbody>{rows}</tbody>
           </Table>
-
+          <Col span={12}>
+            {activeProjectId !== null ? (
+              <Title order={3}>Edytuj projekt</Title>
+            ) : (
+              <Title order={3}>Dodaj projekt</Title>
+            )}
+          </Col>
           <form onSubmit={projectHandleSubmit(onProjectSubmit)}>
             <TextInput {...projectRegister('title')} label="Title" required placeholder="Enter project title" />
             <TextInput
@@ -197,7 +228,7 @@ export default function ProjectsPage() {
 
         {activeProjectId && (
           <Col span={12}>
-            <Title order={2}>Tasks</Title>
+            <Title order={2}>Tasks {projects.find((project) => project.id === activeProjectId)?.title}</Title>
 
             <Table>
               <thead>{ths}</thead>

@@ -21,6 +21,7 @@ import ReactDatePicker from 'react-datepicker';
 import ReactSelect from 'react-select';
 
 import { Task, TaskHour, WorkDay } from '../../../typings/types';
+import { useApi } from '../../ApiProvider';
 
 const SpaceForModal = styled.div`
   padding-bottom: 8rem;
@@ -32,21 +33,52 @@ const SelectInputContainer = styled.div`
 type AddTaskHoursModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  workDay: WorkDay;
 };
+async function submitData(data: any) {
+  try {
+    const response = await fetch('/api/task-hours', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
-export const AddTaskHoursModal = ({ isOpen, onClose }: AddTaskHoursModalProps) => {
+    if (!response.ok) {
+      throw new Error('Failed to submit task hours data');
+    }
+
+    const taskHour = await response.json();
+    return taskHour as TaskHour;
+  } catch (error) {
+    console.error('Error submitting task hours data:', error);
+    throw error;
+  }
+}
+
+export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModalProps) => {
   const { register, handleSubmit, control, watch, reset } = useForm();
-  const [searchParams] = useSearchParams();
-  const userId = searchParams.get('user') || undefined;
-
-  const { data: tasks, isLoading } = useQuery<Task[], Error>(['tasks', userId], () => fetchTasksForUser(userId));
-
-  const mutation = useMutation(submitData, {
-    onSuccess: () => {
-      reset();
-      onClose();
-    },
+  const userId = String(workDay.userId);
+  const api = useApi();
+  const { data: tasks, isLoading } = useQuery<Task[], Error>(['tasks', userId], async () => {
+    const response = await api.get<Task[]>('/tasks?userId=' + userId);
+    return response.data;
   });
+
+  const mutation = useMutation(
+    async (data: TaskHour) => {
+      console.log('mutation data', data);
+      const response = await api.post<TaskHour>(`/reports/${userId}/${workDay.id}`, data);
+      return response.data;
+    },
+    {
+      onSuccess: () => {
+        reset();
+        onClose();
+      },
+    }
+  );
 
   const onSubmit = (data: any) => {
     console.log(data);
@@ -173,28 +205,6 @@ async function fetchTasksForUser(userId?: string) {
     return tasks as Task[];
   } catch (error) {
     console.error('Error fetching tasks:', error);
-    throw error;
-  }
-}
-
-async function submitData(data: any) {
-  try {
-    const response = await fetch('/api/task-hours', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit task hours data');
-    }
-
-    const taskHour = await response.json();
-    return taskHour as TaskHour;
-  } catch (error) {
-    console.error('Error submitting task hours data:', error);
     throw error;
   }
 }

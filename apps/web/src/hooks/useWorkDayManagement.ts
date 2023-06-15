@@ -15,7 +15,7 @@ export type CreateWorkDayDto = {
 
 const useWorkDayManagement = ({ userId, day }: DailyDataHandlerParams) => {
   const api = useApi();
-
+  console.log('useWorkDayManagement', userId, day);
   const queryParams: Record<string, string> = {};
   if (userId) {
     queryParams.userId = userId;
@@ -26,7 +26,7 @@ const useWorkDayManagement = ({ userId, day }: DailyDataHandlerParams) => {
   const queryString = new URLSearchParams(queryParams).toString();
   const apiUrl = `/reports/daily${queryString ? `?${queryString}` : ''}`;
 
-  const workDayQuery = useQuery<WorkDay[]>(['daily', queryString], async () => {
+  const workDayQuery = useQuery<WorkDay[]>(['workDay', userId, day, queryString], async () => {
     const response = await api.get<WorkDay[]>(apiUrl);
     return response.data;
   });

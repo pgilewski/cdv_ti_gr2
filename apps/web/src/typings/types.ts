@@ -66,7 +66,7 @@ export type WorkDay = {
   updatedAt: string;
   isReviewed: boolean;
   reviewedBy?: number;
-  hours: TaskHour[];
+  hours?: TaskHour[];
   comments: Comment[];
   user: User;
 };

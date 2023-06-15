@@ -8,7 +8,7 @@ import { AppContainer } from './components/AppContainer';
 import AppRoutes from './components/AppRoutes';
 import AuthProvider from './features/auth/AuthProvider';
 import { ApiProvider } from './features/ApiProvider';
-import { NotyfProvider } from './hooks/useNotyf';
+import 'notyf/notyf.min.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {

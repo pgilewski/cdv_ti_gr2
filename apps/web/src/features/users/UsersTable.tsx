@@ -1,9 +1,10 @@
 import { useContext, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Button, Container, Table, TextInput, Title, useMantineTheme } from '@mantine/core';
-
+import { Controller, useForm } from 'react-hook-form';
+import { Button, Container, Select, Table, TextInput, Title, useMantineTheme } from '@mantine/core';
 import useUserManagement from '../../hooks/useUserManagement';
 import { NotyfContext } from '../../hooks/useNotyf';
+import { useQueryClient } from 'react-query';
+import ReactSelect from 'react-select';
 
 export default function UsersTable() {
   const notyf = useContext(NotyfContext);
@@ -13,15 +14,15 @@ export default function UsersTable() {
     updateUserMutation,
     deleteUserMutation,
   } = useUserManagement();
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, control } = useForm();
   const theme = useMantineTheme();
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   console.log(users);
   if (!users) {
     return null;
   }
-
   const onUserSubmit = (data: any) => {
     if (activeUserId) {
       updateUserMutation.mutate(
@@ -31,6 +32,7 @@ export default function UsersTable() {
             notyf.success('User updated successfully!');
             reset();
             setActiveUserId(null);
+            queryClient.invalidateQueries('users');
           },
           onError: () => {
             notyf.error('An error occurred while updating the user!');
@@ -42,6 +44,7 @@ export default function UsersTable() {
         onSuccess: () => {
           notyf.success('User created successfully!');
           reset();
+          queryClient.invalidateQueries('users');
         },
         onError: (error) => {
           notyf.error('An error occurred while creating the user!');
@@ -55,22 +58,43 @@ export default function UsersTable() {
     if (userToEdit) {
       setActiveUserId(String(userId));
       reset({
-        name: userToEdit.firstName,
+        firstName: userToEdit.firstName,
+        lastName: userToEdit.lastName,
         email: userToEdit.email,
+        role: userToEdit.role,
       });
     }
   };
-
+  // const [value, setValue] = useStat<string | null>(null);
+  const selectOptions = [
+    { value: 'Pracownik', label: 'Pracownik' },
+    { value: 'Moderator', label: 'Moderator' },
+    { value: 'Administrator', label: 'Administrator' },
+  ];
   return (
     <Container>
-      <Title order={1}>Users</Title>
-
+      <Button
+        color={'green'}
+        onClick={() => {
+          setActiveUserId(null);
+          reset({
+            firstName: '',
+            lastName: '',
+            email: '',
+            role: 'Pracownik',
+          });
+        }}
+      >
+        Add user
+      </Button>
       <Table>
         <thead>
           <tr>
-            <th>Name</th>
+            <th>Imie</th>
+            <th>Nazwisko</th>
             <th>Email</th>
-            <th>Actions</th>
+            <th>Rola</th>
+            <th>Akcje</th>
           </tr>
         </thead>
         <tbody>
@@ -79,6 +103,7 @@ export default function UsersTable() {
               <td>{user.firstName}</td>
               <td>{user.lastName}</td>
               <td>{user.email}</td>
+              <td>{user.role}</td>
               <td>
                 <Button onClick={() => deleteUserMutation.mutate(String(user.id))} color="red">
                   Delete
@@ -89,10 +114,25 @@ export default function UsersTable() {
           ))}
         </tbody>
       </Table>
-
+      {activeUserId ? <Title order={3}>Edytuj użytkownika</Title> : <Title order={3}>Dodaj użytkownika</Title>}
       <form onSubmit={handleSubmit(onUserSubmit)}>
-        <TextInput {...register('name')} label="Name" required placeholder="Enter user name" />
-        <TextInput {...register('email')} label="Email" required placeholder="Enter user email" />
+        <TextInput {...register('firstName')} label="Name" required placeholder="Wpisz imie" />
+        <TextInput {...register('lastName')} label="Name" required placeholder="Wpisz nazwisko" />
+        <TextInput {...register('email')} label="Email" placeholder="Enter user email" disabled />
+        Rola:
+        <Controller
+          control={control}
+          name="role"
+          render={({ field: { onChange, value, name, ref } }) => (
+            <ReactSelect
+              ref={ref}
+              classNamePrefix="addl-class"
+              options={selectOptions}
+              value={selectOptions.find((c) => c.value === value)}
+              onChange={(val) => onChange(val?.value)}
+            />
+          )}
+        />
         <Button type="submit" color="blue">
           Save User
         </Button>

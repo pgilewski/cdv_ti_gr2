@@ -25,7 +25,7 @@ const useUserManagement = () => {
 
   const updateUserMutation = useMutation<User, Error, UpdateUserDto>(async (updatedUser) => {
     const { id, ...rest } = updatedUser;
-    const response = await api.put<User>(`/users/${id}`, rest);
+    const response = await api.patch<User>(`/users/${id}`, rest);
     return response.data;
   });
 
