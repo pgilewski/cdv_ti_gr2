@@ -1,0 +1,5 @@
+// rejestr miesięczny
+
+1. podsumowanie - ilosc godzin w miesiacu, dni potwierdzone / wszystkie dni, 
+
+2. Tabela ze wszystkimi tasko-godzinami (Dzień, Od godziny, do godziny, czas trwania, task, projekt, notatka, czy tasko-godzina jest w potwierdzonym dniu)

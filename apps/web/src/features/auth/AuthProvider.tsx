@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import jwt_decode from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 import AuthContext from './AuthContext';
@@ -42,8 +42,17 @@ const AuthProvider = ({ children }: { children: any }) => {
         api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         setAccessToken(accessToken);
 
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        if (!refreshToken) throw new Error('No refresh token found');
+
+        const response = await api.post('/authentication/refresh-tokens', { refreshToken }); // Send refreshToken to the API
+
+        localStorage.setItem('accessToken', response.data.accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+
         // User info is also refreshed
-        const { userInfo }: any = jwt_decode(accessToken);
+        const { userInfo }: any = jwtDecode(accessToken);
         setUserInfo({ ...userInfo, id: userId });
         console.log(userInfo);
       }
@@ -59,14 +68,16 @@ const AuthProvider = ({ children }: { children: any }) => {
       console.log(response);
 
       if (response.status === 200) {
-        const { accessToken, userId } = response.data;
+        const { accessToken, refreshToken, userId } = response.data;
         console.log('accessToken', accessToken);
 
         api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         setAccessToken(accessToken);
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
 
-        // User info is also refreshed
-        const data: decodedJwt = jwt_decode(accessToken);
+        const data: decodedJwt = jwtDecode(accessToken);
+
         setUserInfo({ ...data, id: userId });
         navigate('/app');
       }
@@ -94,18 +105,38 @@ const AuthProvider = ({ children }: { children: any }) => {
     }
   };
 
-  const signOut = () => {
-    // Clear tokens from local storage
+  function getActiveUser() {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+      return null;
+    }
+    const decodedToken: decodedJwt = jwtDecode(accessToken);
+    // add 'sub' to the returned object, which represents user id in the JWT
+    return { ...decodedToken, id: decodedToken.sub };
+  }
+
+  const signOut = async () => {
+    // Sign out on the server side
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    const response = await api.post('/sign-out');
+
     setAccessToken(undefined);
     setUserInfo(null);
-
-    // Sign out on the server side
-    api.post('/sign-out');
   };
 
+  // Modify your useEffect function to look like this:
   useEffect(() => {
-    // Try to refresh the access token when the app loads
-    refreshAccessToken();
+    // Get the refresh token from local storage
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (refreshToken) {
+      // If there is a refresh token, try to refresh the access token
+      refreshAccessToken();
+    } else {
+      // If there's no refresh token, clear the user info and access token
+      setUserInfo(null);
+      setAccessToken(undefined);
+    }
   }, []);
 
   // Add an interceptor to handle if an API call returns an unauthorized response
