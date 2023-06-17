@@ -32,7 +32,12 @@ const AuthProvider = ({ children }: { children: any }) => {
 
   const refreshAccessToken = async () => {
     try {
-      const response = await api.post('/authentication/refresh-tokens'); // Your refresh token endpoint
+      const refreshToken = localStorage.getItem('refreshToken');
+
+      if (!refreshToken) throw new Error('No refresh token found');
+
+      const response = await api.post('/authentication/refresh-tokens', { refreshToken }); // Send refreshToken to the API
+
       console.log(response);
       if (response.status === 200) {
         const { accessToken, userId } = response.data;
@@ -42,18 +47,12 @@ const AuthProvider = ({ children }: { children: any }) => {
         api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
         setAccessToken(accessToken);
 
-        const refreshToken = localStorage.getItem('refreshToken');
-
-        if (!refreshToken) throw new Error('No refresh token found');
-
-        const response = await api.post('/authentication/refresh-tokens', { refreshToken }); // Send refreshToken to the API
-
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
 
         // User info is also refreshed
-        const { userInfo }: any = jwtDecode(accessToken);
-        setUserInfo({ ...userInfo, id: userId });
+        const data: decodedJwt = jwtDecode(accessToken);
+        setUserInfo({ ...data, id: userId });
         console.log(userInfo);
       }
     } catch (error) {

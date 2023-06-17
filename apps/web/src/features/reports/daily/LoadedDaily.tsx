@@ -64,7 +64,7 @@ const LoadedDaily = ({ dailyWorkDay, open }: { dailyWorkDay: WorkDay | null; ope
           </Button>
         </Flex>
       </Flex>
-      <HoursTable data={dailyWorkDay.hours} />
+      {dailyWorkDay.hours ? <HoursTable data={dailyWorkDay.hours} /> : null}
     </>
   );
 };
