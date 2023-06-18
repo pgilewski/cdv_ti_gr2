@@ -3,28 +3,44 @@ import { useState } from 'react';
 
 import useAuth from '../../hooks/useAuth';
 
-const RegisterPage: React.FC = () => {
-  const { register } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+import { Text, Card, Button, TextInput } from '@mantine/core';
+import styled from '@emotion/styled';
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    register(email, password);
-  };
+const RegisterContainer = styled.div`
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 30px;
+`;
 
+const RegisterPage = () => {
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        required
-      />
-      <button type="submit">Register</button>
-    </form>
+    <RegisterContainer>
+      <Card shadow="sm" padding="xl">
+        <Text align="center" size="xl" style={{ marginBottom: '20px' }}>
+          Rejestracja
+        </Text>
+        <form>
+          <TextInput required label="Email" placeholder="Wprowadź adres email" style={{ marginBottom: '15px' }} />
+          <TextInput
+            required
+            type="password"
+            label="Hasło"
+            placeholder="Wprowadź hasło"
+            style={{ marginBottom: '15px' }}
+          />
+          <TextInput
+            required
+            type="password"
+            label="Powtórz hasło"
+            placeholder="Powtórz hasło"
+            style={{ marginBottom: '15px' }}
+          />
+          <Button fullWidth type="submit">
+            Zarejestruj się
+          </Button>
+        </form>
+      </Card>
+    </RegisterContainer>
   );
 };
 
