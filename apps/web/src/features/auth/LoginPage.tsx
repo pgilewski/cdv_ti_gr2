@@ -1,5 +1,6 @@
 // LoginPage.tsx
-import { Button, Container } from '@mantine/core';
+import { Button, Card, Text, TextInput, Container } from '@mantine/core';
+import styled from '@emotion/styled';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -15,25 +16,50 @@ const LoginPage: React.FC = () => {
     signIn(email, password);
   };
 
+  const LoginContainer = styled.div`
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 30px;
+  `;
+
   return (
-    <Container px={'sm'} py={'sm'}>
-      <form onSubmit={handleSubmit}>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <Button type="submit" mx={'sm'}>
-          Sign In
-        </Button>
-        <Link to="/register">
-          <Button type="submit">Register</Button>
-        </Link>
-      </form>
-    </Container>
+    <LoginContainer>
+      <Card shadow="sm" padding="xl">
+        <Text align="center" size="xl" style={{ marginBottom: '20px' }}>
+          Witamy!
+        </Text>
+        <form onSubmit={handleSubmit}>
+          <TextInput
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Wprowadź adres email"
+            withAsterisk
+            style={{ marginBottom: '15px' }}
+            required
+          />
+          <TextInput
+            label="Hasło"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Wprowadź hasło"
+            withAsterisk
+            style={{ marginBottom: '15px' }}
+            required
+          />
+          <Button type="submit" fullWidth style={{ marginBottom: '15px' }}>
+            Zaloguj się
+          </Button>
+          <Link to="/register">
+            <Button type="submit" fullWidth style={{ marginBottom: '15px' }}>
+              Zarejestruj się
+            </Button>
+          </Link>
+        </form>
+      </Card>
+    </LoginContainer>
   );
 };
 
