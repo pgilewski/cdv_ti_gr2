@@ -3,6 +3,7 @@ import { MonthPickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import useAuth from '../../../hooks/useAuth';
 
 import { useMonthlyData } from '../../../hooks/useMonthlyDataHandler';
 import ReviewDayButton from '../ReviewDayButton';
@@ -11,7 +12,7 @@ import { MonthlyTable } from './MonthlyTable';
 
 export default function MonthlyPage() {
   const [searchParams] = useSearchParams();
-
+  const { userInfo } = useAuth();
   const {
     data: monthlyData,
     isLoading,
@@ -60,9 +61,7 @@ export default function MonthlyPage() {
           </Flex>
         </Grid.Col>
         <Grid.Col span="auto">
-          <Flex justify={'end'}>
-            <ReviewDayButton reviewed={true} canEdit={true} />
-          </Flex>
+          <Flex justify={'end'}>{/* <ReviewDayButton reviewed={true} canEdit={true} userInfo={userInfo} /> */}</Flex>
         </Grid.Col>
       </Grid>
       <Flex>{monthlyData && <MonthlyTable data={monthlyData} />}</Flex>

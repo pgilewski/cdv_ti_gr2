@@ -118,7 +118,7 @@ const AuthProvider = ({ children }: { children: any }) => {
     // Sign out on the server side
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
-    const response = await api.post('/sign-out');
+    // const response = await api.post('/authentication/sign-out');
 
     setAccessToken(undefined);
     setUserInfo(null);

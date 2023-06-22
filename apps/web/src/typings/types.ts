@@ -1,92 +1,111 @@
-export type User = {
-  id: number;
-  email: string;
-  password: string;
-  role: Role;
-  permissions: UserPermission[];
-  createdAt: string;
-  updatedAt: string;
-  firstName?: string;
-  lastName?: string;
-  workDays: WorkDay[];
-  taskHours: TaskHour[];
-  comments: Comment[];
-};
-
-export type Permission = {
-  id: number;
-  name: string;
-  users: UserPermission[];
-};
-
-export type UserPermission = {
-  permissionId: number;
-  permission: Permission;
-  user: User;
-  userId: number;
-};
-
 export enum Role {
   Pracownik = 'Pracownik',
   Moderator = 'Moderator',
   Administrator = 'Administrator',
 }
 
-export type TaskHour = {
+export interface User {
+  id: number;
+  email: string;
+  password: string;
+  role: Role;
+  permissions: UserPermission[];
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  firstName: string | null;
+  lastName: string | null;
+  workDays: WorkDay[];
+  taskHours: TaskHour[];
+  comments: Comment[];
+  userProjects: UserProject[];
+  userTasks: UserTask[];
+}
+
+export interface UserProject {
+  userId: number;
+  user: User;
+  projectId: number;
+  project: Project;
+}
+
+export interface UserTask {
+  userId: number;
+  user: User;
+  taskId: number;
+  task: Task;
+}
+
+export interface Permission {
+  id: number;
+  name: string;
+  users: UserPermission[];
+}
+
+export interface UserPermission {
+  permissionId: number;
+  permission: Permission;
+  userId: number;
+  user: User;
+}
+
+export interface TaskHour {
   id: number;
   taskId: number;
-  createdAt: string;
-  startTime: string;
-  endTime: string;
+  createdAt: Date | string;
+  startTime: Date | string;
+  endTime: Date | string;
   duration: number;
+  note: string | null;
   task: Task;
-  workDay?: WorkDay;
-  workDayId?: number;
-  user: User;
+  workDay: WorkDay | null;
+  workDayId: number | null;
   userId: number;
-};
+  user: User;
+}
 
-export type Comment = {
+export interface Comment {
   id: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
   content: string;
   type: string;
   workdayId: number;
   workday: WorkDay;
   userId: number;
   user: User;
-};
+}
 
-export type WorkDay = {
+export interface WorkDay {
   id: number;
   userId: number;
-  date: string;
-  createdAt: string;
-  updatedAt: string;
+  date: string | Date;
+  createdAt: string | Date;
+  updatedAt: string | Date;
   isReviewed: boolean;
-  reviewedBy?: number;
-  hours?: TaskHour[];
+  reviewedBy: number | null;
+  taskHours?: TaskHour[];
   comments: Comment[];
   user: User;
-};
+}
 
-export type Task = {
+export interface Project {
   id: number;
-  projectId: number;
-  createdAt: string;
-  updatedAt: string;
-  name: string;
-  description: string;
-  taskHours?: TaskHour[];
-  project: Project;
-};
-
-export type Project = {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
   title: string;
   description: string;
   tasks: Task[];
-};
+  userProjects: UserProject[];
+}
+
+export interface Task {
+  id: number;
+  projectId: number;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  name: string;
+  description: string;
+  taskHours: TaskHour[];
+  project: Project;
+  userTasks: UserTask[];
+}

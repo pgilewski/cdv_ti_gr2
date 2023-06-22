@@ -1,27 +1,30 @@
 import { useState } from 'react';
 import { Button } from '@mantine/core';
-import { useMutation } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
+import { WorkDay } from '../../typings/types';
+import { UserInfoType } from '../auth/AuthContext';
+import { useApi } from '../ApiProvider';
+import useWorkDaySearchParams from '../../hooks/useWorkdaySearchParams';
 
 type ReviewDayButtonProps = {
-  reviewed: boolean;
+  reviewed?: boolean;
   canEdit: boolean;
+  workDay: WorkDay | undefined;
+  userInfo: UserInfoType | null;
 };
 
-const ReviewDayButton = ({ reviewed, canEdit }: ReviewDayButtonProps) => {
-  const [isReviewed, setIsReviewed] = useState(reviewed);
-
+const ReviewDayButton = ({ reviewed, canEdit, workDay, userInfo }: ReviewDayButtonProps) => {
+  const api = useApi();
+  const { userId, day } = useWorkDaySearchParams();
+  const queryClient = useQueryClient();
+  if (!userInfo) throw new Error('Missing userInfo');
   const { mutate } = useMutation(
     (reviewStatus: boolean) =>
-      fetch('/api/review-day', {
-        method: 'POST',
-        body: JSON.stringify({ reviewed: reviewStatus }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }),
+      api.patch(`/reports/daily/${workDay?.id}`, { isReviewed: reviewStatus, reviewedBy: userInfo?.id }),
+
     {
       onSuccess: () => {
-        setIsReviewed(!isReviewed);
+        queryClient.invalidateQueries(['workDay', userId, day]);
       },
       onError: (error: any) => {
         console.log('An error occurred:', error);
@@ -30,18 +33,18 @@ const ReviewDayButton = ({ reviewed, canEdit }: ReviewDayButtonProps) => {
   );
   const handleClick = () => {
     if (canEdit) {
-      mutate(!isReviewed);
+      mutate(!reviewed);
     }
   };
 
   return (
     <Button
-      variant={isReviewed ? 'gradient' : 'outline'}
-      color={isReviewed ? 'teal' : 'gray'}
+      variant={reviewed ? 'gradient' : 'outline'}
+      color={reviewed ? 'teal' : 'gray'}
       disabled={!canEdit}
       onClick={handleClick}
     >
-      {isReviewed ? 'Reviewed' : 'Not reviewed'}
+      {reviewed ? 'Reviewed' : 'Not reviewed'}
     </Button>
   );
 };
