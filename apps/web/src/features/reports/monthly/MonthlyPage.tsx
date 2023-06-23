@@ -19,25 +19,25 @@ export default function MonthlyPage() {
     isError,
   } = useMonthlyData({
     userId: searchParams.get('user') || undefined,
-    date: searchParams.get('date') || undefined,
+    month: searchParams.get('month') || undefined,
   });
 
   console.log(searchParams);
 
   const [opened, { open, close }] = useDisclosure(false);
-  const [date, setDate] = useState<Date | null>(new Date());
+  const [month, setMonth] = useState<Date | null>(new Date());
   const [table, setTable] = useState<any>([]);
 
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (date) {
+    if (month) {
       const searchParams = new URLSearchParams(location.search);
-      searchParams.set('date', date.toISOString().slice(0, 7));
+      searchParams.set('date', month.toISOString().slice(0, 7));
       navigate({ search: searchParams.toString() });
     }
-  }, [date]);
+  }, [month]);
 
   return (
     <div>
@@ -52,8 +52,8 @@ export default function MonthlyPage() {
             <MonthPickerInput
               label="Pick date"
               placeholder="Pick date"
-              value={date}
-              onChange={setDate}
+              value={month}
+              onChange={setMonth}
               mx="auto"
               miw={200}
               maw={800}

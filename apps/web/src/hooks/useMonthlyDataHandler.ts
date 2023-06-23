@@ -2,6 +2,7 @@ import { useQuery, UseQueryResult } from 'react-query';
 import axios from 'axios';
 
 import { WorkDay } from '../typings/types';
+import { useApi } from '../features/ApiProvider';
 
 export interface MonthlyData {
   workDays: WorkDay[];
@@ -13,33 +14,30 @@ export interface MonthlyData {
 
 interface MonthlyDataQueryParams {
   userId?: string;
-  date?: string;
+  month?: string;
 }
 
-export const useMonthlyData = ({ userId, date }: MonthlyDataQueryParams): UseQueryResult<MonthlyData> => {
+export const useMonthlyData = ({ userId, month }: MonthlyDataQueryParams): UseQueryResult<MonthlyData> => {
   const queryParams: Record<string, string> = {};
 
   if (userId) {
     queryParams.userId = userId;
   }
 
-  if (date) {
-    queryParams.date = date;
+  if (month) {
+    queryParams.day = month;
   }
 
   const queryString = new URLSearchParams(queryParams).toString();
 
-  const api = axios.create({
-    baseURL: 'http://localhost:2137',
-    withCredentials: true, // This will make sure cookies are sent with every request
-  });
+  const api = useApi();
 
   return useQuery<MonthlyData>(['monthly', queryString], async () => {
-    if (!userId && !date) {
-      const response = await api.get<MonthlyData>(`/monthly`);
+    if (!userId && !month) {
+      const response = await api.get<MonthlyData>(`/reports/monthly`);
       return response.data;
     }
-    const response = await api.get<MonthlyData>(`/monthly?${queryString}`);
+    const response = await api.get<MonthlyData>(`/reports/monthly?${queryString}`);
     return response.data;
   });
 };

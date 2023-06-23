@@ -13,6 +13,7 @@ import dayjs from 'dayjs';
 import TaskHoursTable from './TaskHoursTable';
 import AddDailyData from './AddDailyData';
 import { RotatingLines } from 'react-loader-spinner';
+import Comments from './Comments';
 
 export default function DailyPage() {
   const dayNow = dayjs().format('YYYY-MM-DD');
@@ -56,7 +57,10 @@ export default function DailyPage() {
             <RotatingLines strokeColor="grey" strokeWidth="5" animationDuration="0.75" width="25" visible={true} />
           </Flex>
         ) : workDayQuery.data ? (
-          <TaskHoursTable data={workDayQuery.data} />
+          <>
+            <TaskHoursTable data={workDayQuery.data} />
+            <Comments data={workDayQuery.data} />
+          </>
         ) : (
           <AddDailyData createWorkDayMutation={createWorkDayMutation} date={day} userId={userId} />
         )}

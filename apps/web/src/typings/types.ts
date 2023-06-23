@@ -68,7 +68,7 @@ export interface Comment {
   createdAt: Date | string;
   updatedAt: Date | string;
   content: string;
-  type: string;
+  type: string; // warning | error | ok
   workdayId: number;
   workday: WorkDay;
   userId: number;
