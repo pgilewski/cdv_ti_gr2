@@ -1,7 +1,18 @@
 import { useState } from 'react';
-import { AppShell, Navbar, Header, Footer, Aside, Text, MediaQuery, Burger, useMantineTheme } from '@mantine/core';
+import {
+  AppShell,
+  Navbar,
+  Header,
+  Footer,
+  Aside,
+  Text,
+  MediaQuery,
+  Burger,
+  useMantineTheme,
+  Button,
+} from '@mantine/core';
 import styled from '@emotion/styled';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import useAuth from '../hooks/useAuth';
 
@@ -17,7 +28,8 @@ const HeaderText = styled.div`
 export const AppContainer = () => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
-  const { signOut } = useAuth();
+  const { userInfo, signOut } = useAuth();
+  const navigate = useNavigate();
   return (
     <AppShell
       styles={{
@@ -45,7 +57,7 @@ export const AppContainer = () => {
       // }
       footer={
         <Footer height={60} p="md">
-          You are logged as: John Doe
+          Jesteś zalogowany jako: {userInfo?.email}
         </Footer>
       }
       header={
@@ -69,7 +81,16 @@ export const AppContainer = () => {
             </MediaQuery>
             <HeaderText>📝 Rejestr godzin 📝</HeaderText>
             <div>
-              <Text onClick={signOut}>Wyloguj</Text>
+              <Button
+                variant="default"
+                onClick={() => {
+                  signOut();
+
+                  navigate('/');
+                }}
+              >
+                <Text>Wyloguj</Text>
+              </Button>
             </div>
           </div>
         </Header>

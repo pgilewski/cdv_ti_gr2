@@ -1,19 +1,36 @@
-// LoginPage.tsx
-import { Button, Card, Text, TextInput, Container } from '@mantine/core';
-import styled from '@emotion/styled';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext, useState } from 'react';
 
 import useAuth from '../../hooks/useAuth';
 
-const LoginPage: React.FC = () => {
-  const { signIn } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+import { Text, Card, Button, TextInput } from '@mantine/core';
+import styled from '@emotion/styled';
+import { useForm } from 'react-hook-form';
+import { NotyfContext } from '../../hooks/useNotyf';
+import { Link } from 'react-router-dom';
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    signIn(email, password);
+const RegisterContainer = styled.div`
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 30px;
+`;
+
+const LoginPage = () => {
+  const { signIn } = useAuth();
+  const notyf = useContext(NotyfContext);
+
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm<{ email: string; password: string }>();
+
+  const onSubmit = async ({ email, password }: { email: string; password: string }) => {
+    try {
+      const loginResponse = await signIn(email, password);
+    } catch (error) {
+      notyf.error('Nie udało się zalogować.');
+    }
   };
 
   const LoginContainer = styled.div`
@@ -23,43 +40,39 @@ const LoginPage: React.FC = () => {
   `;
 
   return (
-    <LoginContainer>
+    <RegisterContainer>
       <Card shadow="sm" padding="xl">
         <Text align="center" size="xl" style={{ marginBottom: '20px' }}>
-          Witamy!
+          Logowanie
         </Text>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <TextInput
+            required
             label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             placeholder="Wprowadź adres email"
-            withAsterisk
             style={{ marginBottom: '15px' }}
-            required
+            {...register('email', { required: 'Email is required' })}
           />
           <TextInput
-            label="Hasło"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Wprowadź hasło"
-            withAsterisk
-            style={{ marginBottom: '15px' }}
             required
+            type="password"
+            label="Hasło"
+            placeholder="Wprowadź hasło"
+            style={{ marginBottom: '15px' }}
+            {...register('password', { required: 'Password is required' })}
           />
-          <Button type="submit" fullWidth style={{ marginBottom: '15px' }}>
+
+          <Button fullWidth type="submit">
             Zaloguj się
           </Button>
           <Link to="/register">
-            <Button type="submit" fullWidth style={{ marginBottom: '15px' }}>
-              Zarejestruj się
+            <Button fullWidth my={'sm'} type="submit">
+              Rejestracja
             </Button>
           </Link>
         </form>
       </Card>
-    </LoginContainer>
+    </RegisterContainer>
   );
 };
 

@@ -15,13 +15,17 @@ import {
 import styled from '@emotion/styled';
 import { useMediaQuery } from '@mantine/hooks';
 import { Controller, useForm } from 'react-hook-form';
-import { useMutation, useQuery } from 'react-query';
+import { QueryFunctionContext, useMutation, useQuery, useQueryClient } from 'react-query';
 import { useSearchParams } from 'react-router-dom';
 import ReactDatePicker from 'react-datepicker';
 import ReactSelect from 'react-select';
 
 import { Task, TaskHour, WorkDay } from '../../../typings/types';
 import { useApi } from '../../ApiProvider';
+import useTaskHourManagement, { CreateTaskHourDto } from '../../../hooks/useTaskHourManagement';
+import { NotyfContext } from '../../../hooks/useNotyf';
+import { useContext } from 'react';
+import useWorkDaySearchParams from '../../../hooks/useWorkdaySearchParams';
 
 const SpaceForModal = styled.div`
   padding-bottom: 8rem;
@@ -35,54 +39,55 @@ type AddTaskHoursModalProps = {
   onClose: () => void;
   workDay: WorkDay;
 };
-async function submitData(data: any) {
-  try {
-    const response = await fetch('/api/task-hours', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
 
-    if (!response.ok) {
-      throw new Error('Failed to submit task hours data');
-    }
-
-    const taskHour = await response.json();
-    return taskHour as TaskHour;
-  } catch (error) {
-    console.error('Error submitting task hours data:', error);
-    throw error;
-  }
-}
+type FormData = {
+  startDate: Date;
+  endDate: Date;
+  taskId: number;
+  note?: string;
+};
 
 export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModalProps) => {
-  const { register, handleSubmit, control, watch, reset } = useForm();
+  console.log('AddTaskHoursModal');
+  const { register, handleSubmit, control, watch, reset } = useForm<FormData>();
+
   const userId = String(workDay.userId);
+
   const api = useApi();
+
+  const { day } = useWorkDaySearchParams();
+
+  const notyf = useContext(NotyfContext);
+
   const { data: tasks, isLoading } = useQuery<Task[], Error>(['tasks', userId], async () => {
     const response = await api.get<Task[]>('/tasks?userId=' + userId);
     return response.data;
   });
 
-  const mutation = useMutation(
-    async (data: TaskHour) => {
-      console.log('mutation data', data);
-      const response = await api.post<TaskHour>(`/reports/${userId}/${workDay.id}`, data);
-      return response.data;
-    },
-    {
-      onSuccess: () => {
-        reset();
-        onClose();
-      },
-    }
-  );
+  const { createTaskHourMutation } = useTaskHourManagement();
 
-  const onSubmit = (data: any) => {
+  const queryClient = useQueryClient();
+
+  const onSubmit = async (data: FormData) => {
     console.log(data);
-    mutation.mutate(data);
+    const payload: CreateTaskHourDto = {
+      taskId: data.taskId,
+      workDayId: workDay.id,
+      userId: Number(userId),
+      startTime: startDate.toISOString(),
+      endTime: endDate.toISOString(),
+      note: data.note,
+    };
+
+    console.log(payload);
+    try {
+      const createTaskHourResponse = await createTaskHourMutation.mutate(payload);
+      onClose();
+      queryClient.invalidateQueries(['workDay', userId, day]);
+      // notyf.success("")
+    } catch (error) {
+      notyf.error('Nie mozna dodac czasu pracy.');
+    }
   };
 
   const startDate = watch('startDate');
@@ -90,15 +95,15 @@ export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModa
 
   const isMobile = useMediaQuery('(max-width: 50em)');
 
-  // if (isLoading) {
-  //   console.log('isOpen', isOpen);
+  if (isLoading) {
+    console.log('isOpen', isOpen);
 
-  //   return <div>Loading...</div>;
-  // }
+    return <div>Loading...</div>;
+  }
 
-  // if (!tasks) {
-  //   return <div>No tasks found</div>;
-  // }
+  if (!tasks) {
+    return <div>No tasks found</div>;
+  }
 
   const taskOptions = tasks?.map((task) => ({
     value: task.id,
@@ -106,11 +111,11 @@ export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModa
   }));
 
   return (
-    <Modal size={'xl'} opened={isOpen} onClose={onClose} title="" fullScreen={isMobile} centered>
+    <Modal size={'xl'} opened={isOpen} onClose={onClose} title="Add task hours" fullScreen={isMobile} centered>
       <SpaceForModal>
-        <Text size="xl" weight={700}>
+        {/* <Text size="xl" weight={700}>
           Add task hours
-        </Text>
+        </Text> */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <Flex className="" gap={'sm'} justify={'space-evenly'}>
             <div>
@@ -189,22 +194,24 @@ export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModa
     </Modal>
   );
 };
-async function fetchTasksForUser(userId?: string) {
-  if (!userId) {
-    throw new Error('User ID is required');
-  }
+// async function fetchTasksForUser({ queryKey }: QueryFunctionContext): Promise<Task[]> {
+//   const userId = queryKey[1] as string;
 
-  try {
-    const response = await fetch(`/api/tasks?userId=${userId}`);
+//   if (!userId) {
+//     throw new Error('User ID is required');
+//   }
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch tasks');
-    }
+//   try {
+//     const response = await fetch(`/api/tasks?userId=${userId}`);
 
-    const tasks = await response.json();
-    return tasks as Task[];
-  } catch (error) {
-    console.error('Error fetching tasks:', error);
-    throw error;
-  }
-}
+//     if (!response.ok) {
+//       throw new Error('Failed to fetch tasks');
+//     }
+
+//     const tasks = await response.json();
+//     return tasks as Task[];
+//   } catch (error) {
+//     console.error('Error fetching tasks:', error);
+//     throw error;
+//   }
+// }

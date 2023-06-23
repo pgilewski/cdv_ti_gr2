@@ -1,7 +1,9 @@
 import { useMutation, useQuery, UseQueryResult, UseMutationResult } from 'react-query';
 
 import { useApi } from '../features/ApiProvider';
-import { WorkDay } from '../typings/types';
+import { UserInfoType } from '../features/auth/AuthContext';
+import { TaskHour, WorkDay } from '../typings/types';
+import useWorkDaySearchParams from './useWorkdaySearchParams';
 
 interface DailyDataHandlerParams {
   userId?: string;
@@ -13,21 +15,14 @@ export type CreateWorkDayDto = {
   date: string;
 };
 
-const useWorkDayManagement = ({ userId, day }: DailyDataHandlerParams) => {
+const useWorkDayManagement = (userInfo?: UserInfoType | null, dayNow?: string) => {
+  const { userId, day } = useWorkDaySearchParams(dayNow);
   const api = useApi();
-  console.log('useWorkDayManagement', userId, day);
-  const queryParams: Record<string, string> = {};
-  if (userId) {
-    queryParams.userId = userId;
-  }
-  if (day) {
-    queryParams.day = day;
-  }
-  const queryString = new URLSearchParams(queryParams).toString();
-  const apiUrl = `/reports/daily${queryString ? `?${queryString}` : ''}`;
 
-  const workDayQuery = useQuery<WorkDay[]>(['workDay', userId, day, queryString], async () => {
-    const response = await api.get<WorkDay[]>(apiUrl);
+  const apiUrl = `/reports/daily?userId=${userId}&day=${day}`;
+
+  const workDayQuery = useQuery<WorkDay>(['workDay', userId, day], async () => {
+    const response = await api.get<WorkDay>(apiUrl);
     return response.data;
   });
 
