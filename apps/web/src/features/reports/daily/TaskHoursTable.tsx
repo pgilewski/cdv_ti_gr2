@@ -18,6 +18,7 @@ const BinIcon = () => {
       style={{
         width: '20px',
         height: '20px',
+        cursor: 'pointer',
       }}
     >
       <g id="recycle-bin-2--remove-delete-empty-bin-trash-garbage">
@@ -91,7 +92,7 @@ const TaskHoursTable = ({ data }: DailyTable) => {
     <Flex direction={'column'} justify={'center'}>
       <Flex>
         <Text size="lg" weight={600}>
-          Updated at:
+          Ostatnio aktualizowane:
         </Text>
         <Text ml={'4px'} size="lg">
           {formatDate(data.updatedAt)}
@@ -101,7 +102,7 @@ const TaskHoursTable = ({ data }: DailyTable) => {
 
       <Flex justify={'center'}>
         <Button color="blue" onClick={open}>
-          Add hours
+          Dodaj godziny
         </Button>
       </Flex>
 

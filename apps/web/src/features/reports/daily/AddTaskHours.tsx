@@ -111,7 +111,7 @@ export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModa
   }));
 
   return (
-    <Modal size={'xl'} opened={isOpen} onClose={onClose} title="Add task hours" fullScreen={isMobile} centered>
+    <Modal size={'xl'} opened={isOpen} onClose={onClose} title="Dodaj godziny" fullScreen={isMobile} centered>
       <SpaceForModal>
         {/* <Text size="xl" weight={700}>
           Add task hours
@@ -119,7 +119,7 @@ export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModa
         <form onSubmit={handleSubmit(onSubmit)}>
           <Flex className="" gap={'sm'} justify={'space-evenly'}>
             <div>
-              <label htmlFor="startDate">Start Date:</label>
+              <label htmlFor="startDate">Godzina rozpoczęcia:</label>
               <Controller
                 name="startDate"
                 control={control}
@@ -140,7 +140,7 @@ export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModa
               />
             </div>
             <div>
-              <label htmlFor="endDate">End Date:</label>
+              <label htmlFor="endDate">Godzina zakończenia:</label>
               <Controller
                 name="endDate"
                 control={control}
@@ -178,17 +178,23 @@ export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModa
                     options={isLoading ? [] : taskOptions}
                     isLoading={isLoading}
                     isDisabled={isLoading}
-                    placeholder={isLoading ? 'Loading...' : 'Select a task'}
+                    placeholder={isLoading ? 'Loading...' : 'Wybierz task'}
                     onChange={(option) => field.onChange(option?.value)}
                   />
                 )}
               />
             </div>
             <div>
-              <TextInput id="note" placeholder="Co robiles..." label="Note" {...register('note')} autoComplete="off" />
+              <TextInput
+                id="note"
+                placeholder="Co robił_ś..."
+                label="Notatka"
+                {...register('note')}
+                autoComplete="off"
+              />
             </div>
           </SelectInputContainer>
-          <button type="submit">Submit</button>
+          <button type="submit">Wyślij</button>
         </form>
       </SpaceForModal>
     </Modal>

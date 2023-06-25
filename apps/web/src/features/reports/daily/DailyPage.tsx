@@ -32,7 +32,7 @@ export default function DailyPage() {
 
   return (
     <div>
-      <Title>Daily raport</Title>
+      <Title>Rejestr dzienny</Title>
       <Grid m="0">
         <Grid.Col span="auto">{/* <RaportOwnerHeading /> */}</Grid.Col>
         <Grid.Col span={6}>
