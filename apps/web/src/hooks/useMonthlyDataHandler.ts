@@ -6,9 +6,11 @@ import { useApi } from '../features/ApiProvider';
 
 export interface MonthlyData {
   workDays: WorkDay[];
-  hoursTotal: number;
   reviewed: boolean;
   reviewedBy?: string;
+  workDaysCount: number;
+  totalMinutes: number;
+  workDaysReviewedCount: number;
   // define the structure of the data returned from the /monthly endpoint
 }
 

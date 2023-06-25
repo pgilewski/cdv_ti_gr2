@@ -1,31 +1,112 @@
-import { Table } from '@mantine/core';
-
+import styled from '@emotion/styled';
+import { Badge, Paper, Table, Text, Title } from '@mantine/core';
+import { Fragment, ReactNode } from 'react';
 import { MonthlyData } from '../../../hooks/useMonthlyDataHandler';
+import { TaskHour } from '../../../typings/types';
+import { formatDate } from '../../utils';
 
-export const MonthlyTable = ({ data }: { data: MonthlyData }) => {
-  const elements = [{ position: 1, name: 'Hydrogen', symbol: 'H', mass: 1.0079 }];
+interface MonthlyTableProps {
+  data: MonthlyData;
+}
 
-  const ths = (
-    <tr>
-      <th>Godziny</th>
-      <th>Task</th>
-      <th>Notatka</th>
-      <th>Akcje</th>
-    </tr>
-  );
-  const rows = elements.map((element: any) => (
-    <tr key={element.name}>
-      <td>{element.position}</td>
-      <td>{element.name}</td>
-      <td>{element.symbol}</td>
-      <td>{element.mass}</td>
-    </tr>
-  ));
+interface TableContainerProps {
+  children: ReactNode;
+}
+
+const TableContainer = styled(({ children, ...rest }: TableContainerProps) => <Paper {...rest}>{children}</Paper>)`
+  min-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Row = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+`;
+
+const Cell = styled.div`
+  flex-basis: 20%;
+  flex-grow: 1;
+`;
+
+const MonthlyTable = ({ data }: MonthlyTableProps) => {
+  const renderRows = () => {
+    if (data.workDays.length === 0) {
+      return (
+        <Row>
+          <Text size="sm" color="gray">
+            No workdays found.
+          </Text>
+        </Row>
+      );
+    }
+
+    return data.workDays.map((workDay) => {
+      const { taskHours } = workDay;
+
+      return (
+        <Fragment key={workDay.id}>
+          <Row>
+            <Cell>
+              <Title order={4} style={{ marginBottom: '0.5rem' }}>
+                {formatDate(workDay.date)}
+              </Title>
+            </Cell>
+            <Cell>
+              {workDay.isReviewed ? <Badge color="green">Reviewed</Badge> : <Badge color="gray">Pending</Badge>}
+            </Cell>
+          </Row>
+          {renderTaskHours(taskHours)}
+        </Fragment>
+      );
+    });
+  };
+
+  const renderTaskHours = (taskHours?: TaskHour[]) => {
+    if (!taskHours || taskHours.length === 0) {
+      return (
+        <Row>
+          <Cell>
+            <Text size="sm" color="gray">
+              No task hours recorded.
+            </Text>
+          </Cell>
+        </Row>
+      );
+    }
+
+    return taskHours.map((taskHour) => (
+      <Row key={taskHour.id}>
+        <Cell>
+          <Text>{taskHour.task ? taskHour.task.name : 'N/A'}</Text>
+        </Cell>
+        <Cell>
+          <Text>{taskHour.duration}</Text>
+        </Cell>
+        <Cell>
+          <Text>{taskHour.note || '-'}</Text>
+        </Cell>
+      </Row>
+    ));
+  };
 
   return (
-    <Table verticalSpacing="sm" highlightOnHover>
-      <thead>{ths}</thead>
-      <tbody>{rows}</tbody>
-    </Table>
+    <TableContainer>
+      <Row>
+        <Cell>
+          <Text weight={700}>Date</Text>
+        </Cell>
+        <Cell>
+          <Text weight={700}>Status</Text>
+        </Cell>
+      </Row>
+      {renderRows()}
+    </TableContainer>
   );
 };
+
+export default MonthlyTable;

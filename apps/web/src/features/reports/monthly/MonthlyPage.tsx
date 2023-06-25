@@ -7,8 +7,7 @@ import useAuth from '../../../hooks/useAuth';
 
 import { useMonthlyData } from '../../../hooks/useMonthlyDataHandler';
 import ReviewDayButton from '../ReviewDayButton';
-
-import { MonthlyTable } from './MonthlyTable';
+import MonthlyTable from './MonthlyTable';
 
 export default function MonthlyPage() {
   const [searchParams] = useSearchParams();

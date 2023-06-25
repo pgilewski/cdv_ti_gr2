@@ -9,7 +9,7 @@ const CommentContainer = styled.div`
   flex: column;
 `;
 
-const Comment = ({ comment }: { comment: Comment }) => {
+const SingleComment = ({ comment }: { comment: Comment }) => {
   return (
     <CommentContainer>
       <Flex>testestest</Flex>
@@ -22,7 +22,8 @@ const Comments = ({ data }: { data: WorkDay }) => {
   return (
     <div>
       <Textarea placeholder="Tresc komentarza..." label="Dodaj komentarz" withAsterisk />
-      {data.comments?.length > 0 && data.comments.map((comment) => <Comment key={comment.id} comment={comment} />)}
+      {data.comments?.length > 0 &&
+        data.comments.map((comment) => <SingleComment key={comment.id} comment={comment} />)}
     </div>
   );
 };
