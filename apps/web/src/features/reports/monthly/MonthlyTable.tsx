@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Badge, Paper, Table, Text, Title } from '@mantine/core';
+import { Badge, Card, Paper, Table, Text, Title } from '@mantine/core';
 import { Fragment, ReactNode } from 'react';
 import { MonthlyData } from '../../../hooks/useMonthlyDataHandler';
 import { TaskHour } from '../../../typings/types';
@@ -13,7 +13,11 @@ interface TableContainerProps {
   children: ReactNode;
 }
 
-const TableContainer = styled(({ children, ...rest }: TableContainerProps) => <Paper {...rest}>{children}</Paper>)`
+const TableContainer = styled(({ children, ...rest }: TableContainerProps) => (
+  <Card shadow={'sm'} my={'xl'} {...rest}>
+    {children}
+  </Card>
+))`
   min-width: 800px;
   margin: 0 auto;
   padding: 20px;
@@ -53,11 +57,14 @@ const MonthlyTable = ({ data }: MonthlyTableProps) => {
           <Row>
             <Cell>
               <Title order={4} style={{ marginBottom: '0.5rem' }}>
-                {formatDate(workDay.date)}
+                {workDay.date}
               </Title>
             </Cell>
+            <Cell></Cell>
+            <Cell></Cell>
+            <Cell></Cell>
             <Cell>
-              {workDay.isReviewed ? <Badge color="green">Reviewed</Badge> : <Badge color="gray">Pending</Badge>}
+              {workDay.isReviewed ? <Badge color="green">Reviewed</Badge> : <Badge color="gray">NOT REVIEWED</Badge>}
             </Cell>
           </Row>
           {renderTaskHours(taskHours)}
@@ -79,31 +86,52 @@ const MonthlyTable = ({ data }: MonthlyTableProps) => {
       );
     }
 
-    return taskHours.map((taskHour) => (
-      <Row key={taskHour.id}>
-        <Cell>
-          <Text>{taskHour.task ? taskHour.task.name : 'N/A'}</Text>
-        </Cell>
-        <Cell>
-          <Text>{taskHour.duration}</Text>
-        </Cell>
-        <Cell>
-          <Text>{taskHour.note || '-'}</Text>
-        </Cell>
-      </Row>
-    ));
+    return (
+      <>
+        <Row>
+          <Cell>
+            <Text size={'sm'} weight={500}>
+              Nazwa taska
+            </Text>
+          </Cell>
+          <Cell>
+            <Text size={'sm'} weight={500}>
+              Czas trwania (min)
+            </Text>
+          </Cell>
+          <Cell>
+            <Text size={'sm'} weight={500}>
+              Notatka
+            </Text>
+          </Cell>
+        </Row>
+        {taskHours.map((taskHour) => (
+          <Row key={taskHour.id}>
+            <Cell>
+              <Text>{taskHour.task ? taskHour.task.name : 'N/A'}</Text>
+            </Cell>
+            <Cell>
+              <Text>{taskHour.duration}</Text>
+            </Cell>
+            <Cell>
+              <Text>{taskHour.note || '-'}</Text>
+            </Cell>
+          </Row>
+        ))}
+      </>
+    );
   };
 
   return (
     <TableContainer>
-      <Row>
+      {/* <Row>
         <Cell>
           <Text weight={700}>Date</Text>
         </Cell>
         <Cell>
           <Text weight={700}>Status</Text>
         </Cell>
-      </Row>
+      </Row> */}
       {renderRows()}
     </TableContainer>
   );

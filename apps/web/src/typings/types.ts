@@ -78,9 +78,9 @@ export interface Comment {
 export interface WorkDay {
   id: number;
   userId: number;
-  date: string | Date;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  date: string;
+  createdAt: string;
+  updatedAt: string;
   isReviewed: boolean;
   reviewedBy: number | null;
   taskHours?: TaskHour[];

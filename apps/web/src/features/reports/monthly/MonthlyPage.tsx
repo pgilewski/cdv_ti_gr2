@@ -14,6 +14,7 @@ import MonthlyTable from './MonthlyTable';
 export default function MonthlyPage() {
   const [searchParams] = useSearchParams();
   const { userInfo } = useAuth();
+  console.log(searchParams.get('month'));
   const {
     data: monthlyData,
     isLoading,
@@ -66,11 +67,13 @@ export default function MonthlyPage() {
         </Grid.Col>
         <Grid.Col>
           <Flex justify="center" ml="lg">
-            <MonthlySummary />
+            {monthlyData && <MonthlySummary monthlyData={monthlyData} />}
           </Flex>
         </Grid.Col>
+        <Grid.Col>
+          <Flex>{monthlyData && <MonthlyTable data={monthlyData} />}</Flex>
+        </Grid.Col>
       </Grid>
-      <Flex>{monthlyData && <MonthlyTable data={monthlyData} />}</Flex>
     </div>
   );
 }
