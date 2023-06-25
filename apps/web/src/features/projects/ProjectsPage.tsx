@@ -50,9 +50,9 @@ export default function ProjectsPage() {
 
   const ths = (
     <tr>
-      <th>Title</th>
-      <th>Description</th>
-      <th>Actions</th>
+      <th>Nazwa</th>
+      <th>Opis</th>
+      <th>Akcje</th>
     </tr>
   );
 
@@ -90,10 +90,10 @@ export default function ProjectsPage() {
       <th>{project.title}</th>
       <th>{project.description}</th>
       <th>
-        <Button onClick={() => deleteProject(project.id)} color="red">
-          Delete
+        <Button onClick={() => deleteProject(project.id)} color="red" mr={'md'}>
+          Usuń
         </Button>
-        <Button onClick={() => onViewProject(project.id)}>View</Button>
+        <Button onClick={() => onViewProject(project.id)}>Zobacz</Button>
       </th>
     </tr>
   ));
@@ -184,27 +184,30 @@ export default function ProjectsPage() {
   };
   console.log(activeProjectId);
   return (
-    <Container>
-      <Grid gutter={theme.spacing.md}>
-        <Col span={12}>
-          <Title order={2}>Projects</Title>
-          <Button
-            color={'green'}
-            onClick={() => {
-              setActiveProjectId(null);
-              resetProjectForm({
-                title: '',
-                description: '',
-              });
-            }}
-          >
-            Add Project
-          </Button>
+    <div>
+      <Title mb="md">Projekty i taski</Title>
+      <Container>
+        <Grid gutter={theme.spacing.md}>
+          <Col span={12}>
+            <Button
+              color={'green'}
+              my={'sm'}
+              onClick={() => {
+                setActiveProjectId(null);
+                resetProjectForm({
+                  title: '',
+                  description: '',
+                });
+              }}
+            >
+              Dodaj projekt
+            </Button>
 
-          <Table>
-            <thead>{ths}</thead>
-            <tbody>{rows}</tbody>
-          </Table>
+            <Table>
+              <thead>{ths}</thead>
+              <tbody>{rows}</tbody>
+            </Table>
+          </Col>
           <Col span={12}>
             {activeProjectId !== null ? (
               <Title order={3}>Edytuj projekt</Title>
@@ -212,60 +215,52 @@ export default function ProjectsPage() {
               <Title order={3}>Dodaj projekt</Title>
             )}
           </Col>
-          <form onSubmit={projectHandleSubmit(onProjectSubmit)}>
-            <TextInput {...projectRegister('title')} label="Title" required placeholder="Enter project title" />
-            <TextInput
-              {...projectRegister('description')}
-              label="Description"
-              required
-              placeholder="Enter project description"
-            />
-            <Button type="submit" color="blue">
-              Save Project
-            </Button>
-          </form>
-        </Col>
-
-        {activeProjectId && (
-          <Col span={12}>
-            <Title order={2}>Tasks {projects.find((project) => project.id === activeProjectId)?.title}</Title>
-
-            <Table>
-              <thead>{ths}</thead>
-              <tbody>
-                {tasks &&
-                  tasks
-                    .filter((task) => task.projectId === activeProjectId)
-                    .map((task) => (
-                      <tr key={task.id}>
-                        <th>{task.name}</th>
-                        <th>{task.description}</th>
-                        <th>
-                          <Button onClick={() => taskDelete(task.id)} color="red">
-                            Delete
-                          </Button>
-                          <Button onClick={() => onEditTask(task.id)}>Edit</Button>
-                        </th>
-                      </tr>
-                    ))}
-              </tbody>
-            </Table>
-
-            <form onSubmit={taskHandleSubmit(onTaskSubmit)}>
-              <TextInput {...taskRegister('name')} label="Name" required placeholder="Enter task name" />
-              <TextInput
-                {...taskRegister('description')}
-                label="Description"
-                required
-                placeholder="Enter task description"
-              />
-              <Button m={'sm'} type="submit" color="blue">
-                Save Task
+          <Col mb="sm">
+            <form onSubmit={projectHandleSubmit(onProjectSubmit)}>
+              <TextInput {...projectRegister('title')} label="Nazwa" required placeholder="Wpisz nazwę projektu" />
+              <TextInput {...projectRegister('description')} label="Opis" required placeholder="Dodaj opis projektu" />
+              <Button type="submit" color="blue" mt="sm">
+                Zapisz projekt
               </Button>
             </form>
           </Col>
-        )}
-      </Grid>
-    </Container>
+
+          {activeProjectId && (
+            <Col span={12}>
+              <Title order={3}>Tasks {projects.find((project) => project.id === activeProjectId)?.title}</Title>
+
+              <Table>
+                <thead>{ths}</thead>
+                <tbody>
+                  {tasks &&
+                    tasks
+                      .filter((task) => task.projectId === activeProjectId)
+                      .map((task) => (
+                        <tr key={task.id}>
+                          <th>{task.name}</th>
+                          <th>{task.description}</th>
+                          <th>
+                            <Button onClick={() => taskDelete(task.id)} color="red" mr={'md'}>
+                              Usuń
+                            </Button>
+                            <Button onClick={() => onEditTask(task.id)}>Edytuj</Button>
+                          </th>
+                        </tr>
+                      ))}
+                </tbody>
+              </Table>
+
+              <form onSubmit={taskHandleSubmit(onTaskSubmit)}>
+                <TextInput {...taskRegister('name')} label="Nazwa" required placeholder="Wpisz nazwę taska" />
+                <TextInput {...taskRegister('description')} label="Opis" required placeholder="Dodaj opis taska" />
+                <Button mt={'sm'} type="submit" color="blue">
+                  Zapisz task
+                </Button>
+              </form>
+            </Col>
+          )}
+        </Grid>
+      </Container>
+    </div>
   );
 }
