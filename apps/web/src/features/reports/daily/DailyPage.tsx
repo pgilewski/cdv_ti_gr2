@@ -2,7 +2,7 @@ import { Autocomplete, Button, Flex, Grid, Input, Paper, Text, Title } from '@ma
 
 import { useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { WorkDay } from '../../../typings/types';
+import { Role, WorkDay } from '../../../typings/types';
 import { ChangeDayNavbar } from '../ChangeDayNavbar';
 import ReviewDayButton from '../ReviewDayButton';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -17,6 +17,7 @@ import Comments from './Comments';
 import { useFetchUserIdByEmail } from '../../../hooks/useUserFromEmail';
 import useWorkDaySearchParams from '../../../hooks/useWorkdaySearchParams';
 import { NotyfContext } from '../../../hooks/useNotyf';
+import RoleBasedRender from '../../../components/RoleBasedRender';
 
 function useDebounce(value: string, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -79,12 +80,19 @@ export default function DailyPage() {
         <Grid.Col span="auto">
           <Flex mt={'auto'}>
             {' '}
-            <Flex>
-              <Autocomplete data={usersOptions} placeholder="Enter email" value={emailInput} onChange={setEmailInput} />
-              <Button mx="sm" onClick={userSearch}>
-                Wyszukaj
-              </Button>
-            </Flex>
+            <RoleBasedRender allowedRoles={[Role.Administrator, Role.Moderator]} userRole={userInfo?.role}>
+              <Flex>
+                <Autocomplete
+                  data={usersOptions}
+                  placeholder="Enter email"
+                  value={emailInput}
+                  onChange={setEmailInput}
+                />
+                <Button mx="sm" onClick={userSearch}>
+                  Wyszukaj
+                </Button>
+              </Flex>
+            </RoleBasedRender>
           </Flex>
         </Grid.Col>
         <Grid.Col span={4}>

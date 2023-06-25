@@ -1,9 +1,10 @@
 import { createContext } from 'react';
+import { Role } from '../../typings/types';
 
 export type UserInfoType = {
   id: number;
   email: string;
-  role: string;
+  role: Role;
   permissions: string[];
 };
 

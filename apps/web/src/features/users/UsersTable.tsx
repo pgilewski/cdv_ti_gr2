@@ -5,6 +5,9 @@ import useUserManagement from '../../hooks/useUserManagement';
 import { NotyfContext } from '../../hooks/useNotyf';
 import { useQueryClient } from 'react-query';
 import ReactSelect from 'react-select';
+import RoleBasedRender from '../../components/RoleBasedRender';
+import { Role } from '../../typings/types';
+import useAuth from '../../hooks/useAuth';
 
 export default function UsersTable() {
   const notyf = useContext(NotyfContext);
@@ -18,7 +21,7 @@ export default function UsersTable() {
   const theme = useMantineTheme();
   const [activeUserId, setActiveUserId] = useState<string | null>(null);
   const queryClient = useQueryClient();
-
+  const { userInfo } = useAuth();
   console.log(users);
   if (!users) {
     return null;
@@ -73,21 +76,24 @@ export default function UsersTable() {
   ];
   return (
     <Container>
-      <Button
-        color={'green'}
-        my={'sm'}
-        onClick={() => {
-          setActiveUserId(null);
-          reset({
-            firstName: '',
-            lastName: '',
-            email: '',
-            role: 'Pracownik',
-          });
-        }}
-      >
-        Dodaj użytkownika
-      </Button>
+      <RoleBasedRender allowedRoles={[Role.Administrator, Role.Moderator]} userRole={userInfo?.role}>
+        <Button
+          color={'green'}
+          my={'sm'}
+          onClick={() => {
+            setActiveUserId(null);
+            reset({
+              firstName: '',
+              lastName: '',
+              email: '',
+              role: 'Pracownik',
+            });
+          }}
+        >
+          Dodaj użytkownika
+        </Button>
+      </RoleBasedRender>
+
       <Table>
         <thead>
           <tr>
@@ -95,7 +101,9 @@ export default function UsersTable() {
             <th>Nazwisko</th>
             <th>Email</th>
             <th>Rola</th>
-            <th>Akcje</th>
+            <RoleBasedRender allowedRoles={[Role.Administrator, Role.Moderator]} userRole={userInfo?.role}>
+              <th>Akcje</th>
+            </RoleBasedRender>
           </tr>
         </thead>
         <tbody>
@@ -105,48 +113,54 @@ export default function UsersTable() {
               <td>{user.lastName}</td>
               <td>{user.email}</td>
               <td>{user.role}</td>
-              <td>
-                <Button mr={'md'} onClick={() => deleteUserMutation.mutate(String(user.id))} color="red">
-                  Usuń
-                </Button>
-                <Button onClick={() => onEditUser(user.id)}>Edytuj</Button>
-              </td>
+              <RoleBasedRender allowedRoles={[Role.Administrator, Role.Moderator]} userRole={userInfo?.role}>
+                <td>
+                  <Button mr={'md'} onClick={() => deleteUserMutation.mutate(String(user.id))} color="red">
+                    Usuń
+                  </Button>
+                  <Button onClick={() => onEditUser(user.id)}>Edytuj</Button>
+                </td>
+              </RoleBasedRender>
             </tr>
           ))}
         </tbody>
       </Table>
-      {activeUserId ? (
-        <Title mb={'sm'} mt="sm" order={3}>
-          Edytuj użytkownika
-        </Title>
-      ) : (
-        <Title mb={'sm'} mt="sm" order={3}>
-          Dodaj użytkownika
-        </Title>
-      )}
-      <form onSubmit={handleSubmit(onUserSubmit)}>
-        <TextInput {...register('firstName')} label="Imię" required placeholder="Wpisz imię" mb="sm" />
-        <TextInput {...register('lastName')} label="Nazwisko" required placeholder="Wpisz nazwisko" mb="sm" />
-        <TextInput {...register('email')} label="Email" placeholder="Wpisz adres email" disabled mb="sm" />
-        Rola:
-        <Controller
-          control={control}
-          name="role"
-          render={({ field: { onChange, value, name, ref } }) => (
-            <ReactSelect
-              ref={ref}
-              placeholder="Wybierz rolę użytkownika"
-              classNamePrefix="addl-class"
-              options={selectOptions}
-              value={selectOptions.find((c) => c.value === value)}
-              onChange={(val) => onChange(val?.value)}
-            />
+      <RoleBasedRender allowedRoles={[Role.Administrator, Role.Moderator]} userRole={userInfo?.role}>
+        <>
+          {activeUserId ? (
+            <Title mb={'sm'} mt="sm" order={3}>
+              Edytuj użytkownika
+            </Title>
+          ) : (
+            <Title mb={'sm'} mt="sm" order={3}>
+              Dodaj użytkownika
+            </Title>
           )}
-        />
-        <Button type="submit" color="blue" mt="sm">
-          Zapisz
-        </Button>
-      </form>
+          <form onSubmit={handleSubmit(onUserSubmit)}>
+            <TextInput {...register('firstName')} label="Imię" required placeholder="Wpisz imię" mb="sm" />
+            <TextInput {...register('lastName')} label="Nazwisko" required placeholder="Wpisz nazwisko" mb="sm" />
+            <TextInput {...register('email')} label="Email" placeholder="Wpisz adres email" disabled mb="sm" />
+            Rola:
+            <Controller
+              control={control}
+              name="role"
+              render={({ field: { onChange, value, name, ref } }) => (
+                <ReactSelect
+                  ref={ref}
+                  placeholder="Wybierz rolę użytkownika"
+                  classNamePrefix="addl-class"
+                  options={selectOptions}
+                  value={selectOptions.find((c) => c.value === value)}
+                  onChange={(val) => onChange(val?.value)}
+                />
+              )}
+            />
+            <Button type="submit" color="blue" mt="sm">
+              Zapisz
+            </Button>
+          </form>
+        </>
+      </RoleBasedRender>
     </Container>
   );
 }
