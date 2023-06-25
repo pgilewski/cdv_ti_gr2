@@ -18,22 +18,20 @@ const ReviewDayButton = ({ reviewed, canEdit, workDay, userInfo }: ReviewDayButt
   const { userId, day } = useWorkDaySearchParams();
   const queryClient = useQueryClient();
   if (!userInfo) throw new Error('Missing userInfo');
-  const { mutate } = useMutation(
-    (reviewStatus: boolean) =>
-      api.patch(`/reports/daily/${workDay?.id}`, { isReviewed: reviewStatus, reviewedBy: userInfo?.id }),
-
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['workDay', userId, day]);
-      },
-      onError: (error: any) => {
-        console.log('An error occurred:', error);
-      },
-    }
+  const { mutate } = useMutation((reviewStatus: boolean) =>
+    api.patch(`/reports/daily/${workDay?.id}`, { isReviewed: reviewStatus, reviewedBy: userInfo?.id })
   );
   const handleClick = () => {
     if (canEdit) {
-      mutate(!reviewed);
+      mutate(!reviewed, {
+        onSuccess: () => {
+          console.log(workDay);
+          queryClient.invalidateQueries(['workDay', String(workDay?.userId) || userId, workDay?.date || day]);
+        },
+        onError: (error: any) => {
+          console.log('An error occurred:', error);
+        },
+      });
     }
   };
 

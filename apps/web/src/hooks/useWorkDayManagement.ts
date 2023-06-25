@@ -1,3 +1,4 @@
+import { ChangeEvent, useState } from 'react';
 import { useMutation, useQuery, UseQueryResult, UseMutationResult } from 'react-query';
 
 import { useApi } from '../features/ApiProvider';
@@ -15,8 +16,8 @@ export type CreateWorkDayDto = {
   date: string;
 };
 
-const useWorkDayManagement = (userInfo?: UserInfoType | null, dayNow?: string) => {
-  const { userId, day } = useWorkDaySearchParams(dayNow);
+const useWorkDayManagement = (dayNow?: string, userId?: string) => {
+  const { day } = useWorkDaySearchParams(dayNow, userId);
   const api = useApi();
 
   const apiUrl = `/reports/daily?userId=${userId}&day=${day}`;
