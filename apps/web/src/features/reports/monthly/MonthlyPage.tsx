@@ -1,4 +1,4 @@
-import { Flex, Grid, Title } from '@mantine/core';
+import { Flex, Grid, Title, Card, Text, Divider, Group } from '@mantine/core';
 import { MonthPickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
@@ -7,6 +7,8 @@ import useAuth from '../../../hooks/useAuth';
 
 import { useMonthlyData } from '../../../hooks/useMonthlyDataHandler';
 import ReviewDayButton from '../ReviewDayButton';
+import MonthlySummary from './MonthlySummary';
+
 import MonthlyTable from './MonthlyTable';
 
 export default function MonthlyPage() {
@@ -61,6 +63,11 @@ export default function MonthlyPage() {
         </Grid.Col>
         <Grid.Col span="auto">
           <Flex justify={'end'}>{/* <ReviewDayButton reviewed={true} canEdit={true} userInfo={userInfo} /> */}</Flex>
+        </Grid.Col>
+        <Grid.Col>
+          <Flex justify="center" ml="lg">
+            <MonthlySummary />
+          </Flex>
         </Grid.Col>
       </Grid>
       <Flex>{monthlyData && <MonthlyTable data={monthlyData} />}</Flex>

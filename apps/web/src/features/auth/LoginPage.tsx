@@ -7,12 +7,7 @@ import styled from '@emotion/styled';
 import { useForm } from 'react-hook-form';
 import { NotyfContext } from '../../hooks/useNotyf';
 import { Link } from 'react-router-dom';
-
-const RegisterContainer = styled.div`
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 30px;
-`;
+import { AuthContainer } from './AuthStyles';
 
 const LoginPage = () => {
   const { signIn } = useAuth();
@@ -34,7 +29,7 @@ const LoginPage = () => {
   };
 
   return (
-    <RegisterContainer>
+    <AuthContainer>
       <Card shadow="sm" padding="xl">
         <Text align="center" size="xl" style={{ marginBottom: '20px' }}>
           Logowanie
@@ -66,7 +61,7 @@ const LoginPage = () => {
           </Link>
         </form>
       </Card>
-    </RegisterContainer>
+    </AuthContainer>
   );
 };
 

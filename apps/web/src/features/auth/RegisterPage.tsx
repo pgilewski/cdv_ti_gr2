@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 import { useForm } from 'react-hook-form';
 import { NotyfContext } from '../../hooks/useNotyf';
 
-const RegisterContainer = styled.div`
+const AuthContainer = styled.div`
   max-width: 400px;
   margin: 0 auto;
   padding: 30px;
@@ -56,7 +56,7 @@ const RegisterPage = () => {
   // };
 
   return (
-    <RegisterContainer>
+    <AuthContainer>
       <Card shadow="sm" padding="xl">
         <Text align="center" size="xl" style={{ marginBottom: '20px' }}>
           Rejestracja
@@ -100,7 +100,7 @@ const RegisterPage = () => {
           </Button>
         </form>
       </Card>
-    </RegisterContainer>
+    </AuthContainer>
   );
 };
 
