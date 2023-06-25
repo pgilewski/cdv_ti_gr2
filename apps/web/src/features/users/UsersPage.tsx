@@ -6,7 +6,7 @@ import UsersTable from './UsersTable';
 function UsersPage() {
   return (
     <div>
-      <Title>Użytkownicy</Title>
+      <Title mb="md">Użytkownicy</Title>
       <UsersTable />
     </div>
   );

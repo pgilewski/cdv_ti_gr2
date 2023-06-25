@@ -75,6 +75,7 @@ export default function UsersTable() {
     <Container>
       <Button
         color={'green'}
+        my={'sm'}
         onClick={() => {
           setActiveUserId(null);
           reset({
@@ -85,12 +86,12 @@ export default function UsersTable() {
           });
         }}
       >
-        Add user
+        Dodaj użytkownika
       </Button>
       <Table>
         <thead>
           <tr>
-            <th>Imie</th>
+            <th>Imię</th>
             <th>Nazwisko</th>
             <th>Email</th>
             <th>Rola</th>
@@ -105,20 +106,28 @@ export default function UsersTable() {
               <td>{user.email}</td>
               <td>{user.role}</td>
               <td>
-                <Button onClick={() => deleteUserMutation.mutate(String(user.id))} color="red">
-                  Delete
+                <Button mr={'md'} onClick={() => deleteUserMutation.mutate(String(user.id))} color="red">
+                  Usuń
                 </Button>
-                <Button onClick={() => onEditUser(user.id)}>Edit</Button>
+                <Button onClick={() => onEditUser(user.id)}>Edytuj</Button>
               </td>
             </tr>
           ))}
         </tbody>
       </Table>
-      {activeUserId ? <Title order={3}>Edytuj użytkownika</Title> : <Title order={3}>Dodaj użytkownika</Title>}
+      {activeUserId ? (
+        <Title mb={'sm'} mt="sm" order={3}>
+          Edytuj użytkownika
+        </Title>
+      ) : (
+        <Title mb={'sm'} mt="sm" order={3}>
+          Dodaj użytkownika
+        </Title>
+      )}
       <form onSubmit={handleSubmit(onUserSubmit)}>
-        <TextInput {...register('firstName')} label="Name" required placeholder="Wpisz imie" />
-        <TextInput {...register('lastName')} label="Name" required placeholder="Wpisz nazwisko" />
-        <TextInput {...register('email')} label="Email" placeholder="Enter user email" disabled />
+        <TextInput {...register('firstName')} label="Imię" required placeholder="Wpisz imię" mb="sm" />
+        <TextInput {...register('lastName')} label="Nazwisko" required placeholder="Wpisz nazwisko" mb="sm" />
+        <TextInput {...register('email')} label="Email" placeholder="Wpisz adres email" disabled mb="sm" />
         Rola:
         <Controller
           control={control}
@@ -126,6 +135,7 @@ export default function UsersTable() {
           render={({ field: { onChange, value, name, ref } }) => (
             <ReactSelect
               ref={ref}
+              placeholder="Wybierz rolę użytkownika"
               classNamePrefix="addl-class"
               options={selectOptions}
               value={selectOptions.find((c) => c.value === value)}
@@ -133,8 +143,8 @@ export default function UsersTable() {
             />
           )}
         />
-        <Button type="submit" color="blue">
-          Save User
+        <Button type="submit" color="blue" mt="sm">
+          Zapisz
         </Button>
       </form>
     </Container>
