@@ -1,7 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Flex, Textarea, Button, Card, Select, Badge } from '@mantine/core';
 import dayjs from 'dayjs';
 import styled from '@emotion/styled';
+import { Comment, workDay } from '../../../typings/types';
+import useCommentsManagement from '../../../hooks/useCommentsManagement';
+import { NotyfContext } from '../../../hooks/useNotyf';
+import { useQueryClient } from 'react-query';
 
 export enum CommentType {
   Warning = 'warning',
@@ -9,25 +13,7 @@ export enum CommentType {
   Ok = 'ok',
 }
 
-interface Comment {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  content: string;
-  type: CommentType;
-  workdayId: number;
-  workday: any; 
-  userId: number;
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    role: string;
-  };
-}
-
 const CommentContainer = styled.div`
-  max-width: 800px;
   margin: 10px;
   padding: 20px;
   display: flex;
@@ -54,8 +40,8 @@ interface SingleCommentProps {
   handleDeleteComment: (id: number) => void;
 }
 
-const SingleComment: React.FC<SingleCommentProps> = ({ comment, handleDeleteComment }) => {
-  const getCommentTypeColor = (type: CommentType) => {
+const SingleComment = ({ comment, handleDeleteComment }: SingleCommentProps) => {
+  const getCommentTypeColor = (type: string) => {
     switch (type) {
       case CommentType.Warning:
         return 'orange';
@@ -74,18 +60,20 @@ const SingleComment: React.FC<SingleCommentProps> = ({ comment, handleDeleteComm
 
   return (
     <CommentContainer>
-      <Flex>
-        <strong>{dayjs(comment.updatedAt).format('YYYY-MM-DD HH:mm')}</strong>
-        <Badge color={getCommentTypeColor(comment.type)}>{comment.type}</Badge>
+      <Flex justify={'space-between'}>
+        <div>
+          <strong>{dayjs(comment.updatedAt).format('YYYY-MM-DD HH:mm')}</strong>
+          <Badge color={getCommentTypeColor(comment.type)} ml={'sm'}>
+            {comment.type}
+          </Badge>
+        </div>
         <CommentAuthor style={{ marginLeft: '400px' }}>
           <small>
-            Autor: {comment.user.firstName} {comment.user.lastName} ({comment.user.role})
+            Autor: {comment.user?.firstName} {comment.user?.lastName} ({comment.user?.role})
           </small>
         </CommentAuthor>
       </Flex>
-      <CommentContent color={getCommentTypeColor(comment.type)}>
-        {comment.content}
-      </CommentContent>
+      <CommentContent color={getCommentTypeColor(comment.type)}>{comment.content}</CommentContent>
       <CommentButtonContainer>
         <Button size="xs" variant="outline" color="red" onClick={handleDelete}>
           Usuń
@@ -96,26 +84,23 @@ const SingleComment: React.FC<SingleCommentProps> = ({ comment, handleDeleteComm
 };
 
 interface CommentsProps {
-  data: any;
+  data: workDay;
 }
 
-const Comments: React.FC<CommentsProps> = ({ data }) => {
-  const [newComment, setNewComment] = useState<Comment>({
+const Comments = ({ data }: CommentsProps) => {
+  const { createCommentMutation, deleteCommentMutation } = useCommentsManagement();
+  const notyf = useContext(NotyfContext);
+  const queryClient = useQueryClient();
+  const defaultCommentState = {
     id: 0,
     createdAt: '',
     updatedAt: '',
     content: '',
     type: CommentType.Ok,
-    workdayId: 0,
-    workday: {} as any,
-    userId: 0,
-    user: {
-      id: 0,
-      firstName: '',
-      lastName: '',
-      role: '',
-    },
-  });
+    workDayId: data.id,
+    userId: data.userId,
+  };
+  const [newComment, setNewComment] = useState<Comment>(defaultCommentState);
   const [comments, setComments] = useState<Comment[]>(data.comments || []);
 
   const handleCommentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -128,37 +113,54 @@ const Comments: React.FC<CommentsProps> = ({ data }) => {
 
   const handleAddComment = () => {
     const newCommentWithDetails = {
-      ...newComment,
-      id: comments.length + 1,
-      createdAt: new Date().toString(),
-      updatedAt: new Date().toString(),
-      workdayId: data.id,
-      workday: data,
+      content: newComment.content,
+      type: newComment.type,
+      workDayId: data.id,
       userId: data.userId,
-      user: data.user,
     };
 
-    setComments((prevComments) => [...prevComments, newCommentWithDetails]);
+    try {
+      createCommentMutation.mutate(newCommentWithDetails, {
+        onSuccess: () => {
+          notyf.success('Comment created successfully!');
+          queryClient.invalidateQueries(['workDay', data.userId, data.id]);
+        },
+        onError: (error) => {
+          notyf.error('An error occurred while creating the comment!');
+        },
+      });
+    } catch (error) {
+      console.error('Error creating comment:', error);
+    }
+
     setNewComment({
       id: 0,
       createdAt: '',
       updatedAt: '',
       content: '',
       type: CommentType.Ok,
-      workdayId: 0,
-      workday: {} as any,
+      workDayId: 0,
+      workDay: {} as any,
       userId: 0,
-      user: {
-        id: 0,
-        firstName: '',
-        lastName: '',
-        role: '',
-      },
     });
   };
 
   const handleDeleteComment = (id: number) => {
     setComments((prevComments) => prevComments.filter((comment) => comment.id !== id));
+
+    try {
+      deleteCommentMutation.mutate(id, {
+        onSuccess: () => {
+          notyf.success('Comment deleted successfully!');
+          queryClient.invalidateQueries(['workDay', data.userId, data.id]);
+        },
+        onError: (error) => {
+          notyf.error('An error occurred while deleting the comment!');
+        },
+      });
+    } catch (error) {
+      console.error('Error creating comment:', error);
+    }
   };
 
   useEffect(() => {
@@ -175,16 +177,14 @@ const Comments: React.FC<CommentsProps> = ({ data }) => {
         onChange={handleCommentChange}
       />
       <Flex justify="center" align="center" style={{ marginTop: '10px', marginBottom: '10px' }}>
-        <Select<CommentType>
+        <Select
           data={[
             { label: 'Warning', value: CommentType.Warning },
             { label: 'Error', value: CommentType.Error },
             { label: 'OK', value: CommentType.Ok },
           ]}
           value={newComment.type}
-          onChange={(value) => handleCommentTypeChange(value)}
-          itemLabel={(item) => item.label}
-          itemValue={(item) => item.value}
+          onChange={(value: CommentType) => handleCommentTypeChange(value)}
           size="sm"
           style={{ marginRight: '10px' }}
         />
@@ -193,7 +193,7 @@ const Comments: React.FC<CommentsProps> = ({ data }) => {
         </Button>
       </Flex>
       {comments.length > 0 && (
-        <Card shadow="xs" padding="md" marginTop="md">
+        <Card shadow="xs" padding="md" mt="md">
           <strong>Komentarze:</strong>
           {comments.map((comment) => (
             <SingleComment key={comment.id} comment={comment} handleDeleteComment={handleDeleteComment} />
