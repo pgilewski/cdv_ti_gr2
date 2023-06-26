@@ -27,7 +27,7 @@ const RegisterPage = () => {
   const onSubmit = async ({ email, password }: { email: string; password: string; repeatPassword?: string }) => {
     try {
       const registerResponse = await registerUser(email, password);
-      if (registerResponse.statusCode === 201) {
+      if (registerResponse === 201) {
         notyf.success('Utworzono konto.');
       } else {
         notyf.error('Nie udało się utworzyć konta.');

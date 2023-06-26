@@ -3,12 +3,14 @@ import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 import { Navigate, useNavigate } from 'react-router-dom';
 
-import AuthContext from './AuthContext';
+import AuthContext, { UserInfoType } from './AuthContext';
+import { Role } from '../../typings/types';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 type decodedJwt = {
   sub: number;
   email: string;
-  role: string;
+  role: Role;
   permissions: string[];
   iat: number;
   exp: number;
@@ -17,12 +19,45 @@ type decodedJwt = {
 };
 
 const AuthProvider = ({ children }: { children: any }) => {
+  const queryClient = useQueryClient();
+
+  const accessTokenQuery = useQuery<string | null>('accessToken', () =>
+    Promise.resolve(localStorage.getItem('accessToken'))
+  );
+
+  const updateAccessToken = async (newAccessToken: string | undefined) => {
+    if (!newAccessToken) {
+      localStorage.removeItem('accessToken');
+      return;
+    }
+    localStorage.setItem('accessToken', newAccessToken);
+    return;
+  };
+
+  const setAccessTokenMutation = useMutation(updateAccessToken);
+
+  const userInfoQuery = useQuery<UserInfoType | null>('userInfo', () => getActiveUser());
+
+  const updateUserInfo = async (newUserInfo: UserInfoType | null) => {
+    setUserInfo(newUserInfo);
+  };
+
+  const setUserInfoMutation = useMutation(updateUserInfo);
+
+  // Replace api instance with a React Query mutation
+  const refreshAccessTokenMutation = useMutation((refreshToken: string) =>
+    api.post('/authentication/refresh-tokens', { refreshToken })
+  );
+
+  const registerMutation = useMutation((userData: { email: string; password: string }) =>
+    api.post('/authentication/sign-up', userData)
+  );
+
+  // Replace navigate function with useNavigate hook
   const navigate = useNavigate();
 
   const [accessToken, setAccessToken] = useState<string | undefined>(undefined);
-  const [userInfo, setUserInfo] = useState<{ id: number; email: string; role: string; permissions: string[] } | null>(
-    null
-  );
+  const [userInfo, setUserInfo] = useState<UserInfoType | null>(null); // Update the type here
 
   // Set up axios to use with your API
   const api = axios.create({
@@ -36,72 +71,66 @@ const AuthProvider = ({ children }: { children: any }) => {
 
       if (!refreshToken) throw new Error('No refresh token found');
 
-      const response = await api.post('/authentication/refresh-tokens', { refreshToken }); // Send refreshToken to the API
+      const response = await refreshAccessTokenMutation.mutateAsync(refreshToken);
 
-      console.log(response);
       if (response.status === 200) {
         const { accessToken, userId } = response.data;
-        console.log('accessToken', accessToken);
 
         // Set the new access token in the Authorization header
-        api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        setAccessToken(accessToken);
+        setAccessTokenMutation.mutate(accessToken);
 
-        localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
 
         // User info is also refreshed
         const data: decodedJwt = jwtDecode(accessToken);
-        setUserInfo({ ...data, id: userId });
-        console.log(userInfo);
+        setUserInfoMutation.mutate({ ...data, id: userId });
+
         navigate('/app');
       }
     } catch (error) {
       console.error('Failed to refresh access token:', error);
-      signOut();
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
       const response = await api.post('/authentication/sign-in', { email, password });
-      console.log(response);
-
       if (response.status === 200) {
         const { accessToken, refreshToken, userId } = response.data;
-        console.log('accessToken', accessToken);
+        console.log('response.data', response.data);
 
-        api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        setAccessToken(accessToken);
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
+        setAccessTokenMutation.mutate(accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
 
         const data: decodedJwt = jwtDecode(accessToken);
+        setUserInfoMutation.mutate({ ...data, id: userId }, { onSuccess: () => navigate('/app') });
 
-        setUserInfo({ ...data, id: userId });
-        navigate('/app');
+        return { ...data, id: userId };
       }
     } catch (error) {
       console.error('Failed to sign in:', error);
     }
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (email: string, password: string): Promise<number> => {
     try {
-      const response = await api.post('/authentication/sign-up', { email, password });
-
+      const response = await registerMutation.mutateAsync({ email, password });
+      console.log(response);
       if (response.status === 201) {
         const { accessToken } = response.data;
         console.log('accessToken', accessToken);
 
         api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-        setAccessToken(accessToken);
+        setAccessTokenMutation.mutate(accessToken);
 
         const { userInfo } = response.data;
-        setUserInfo(userInfo);
+        setUserInfoMutation.mutate(userInfo);
+        return response.status;
       }
+      return response.status ?? 0;
     } catch (error) {
       console.error('Failed to register:', error);
+      throw error;
     }
   };
 
@@ -116,57 +145,36 @@ const AuthProvider = ({ children }: { children: any }) => {
   }
 
   const signOut = async () => {
-    // Sign out on the server side
-    localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
-    // const response = await api.post('/authentication/sign-out');
 
-    setAccessToken(undefined);
-    setUserInfo(null);
+    setAccessTokenMutation.mutate(undefined);
+    setUserInfoMutation.mutate(null);
   };
 
-  // Modify your useEffect function to look like this:
   useEffect(() => {
-    // Get the refresh token from local storage
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (refreshToken) {
-      // If there is a refresh token, try to refresh the access token
-      refreshAccessToken();
-    } else {
-      // If there's no refresh token, clear the user info and access token
-      setUserInfo(null);
-      setAccessToken(undefined);
+    const refreshTokens = async () => {
+      await refreshAccessToken();
+    };
+
+    if (userInfoQuery.data === null) {
+      refreshTokens();
     }
+  }, [userInfoQuery.data]);
+
+  useEffect(() => {
+    refreshAccessToken();
   }, []);
-
-  // Add an interceptor to handle if an API call returns an unauthorized response
-  api.interceptors.response.use(
-    (config) => {
-      console.log('accessToken', accessToken);
-
-      config.headers['Authorization'] = `Bearer ${accessToken}`;
-      return config;
-    },
-    async (error) => {
-      const originalRequest = error.config;
-
-      // Check if the status is 401 and the request was not previously retried
-      if (
-        error.response.status === 401 &&
-        !originalRequest._retry &&
-        originalRequest.url !== '/authentication/refresh-tokens'
-      ) {
-        originalRequest._retry = true;
-        await refreshAccessToken();
-        return api(originalRequest);
-      }
-
-      return Promise.reject(error);
-    }
-  );
-
   return (
-    <AuthContext.Provider value={{ accessToken, userInfo, signOut, signIn, register, refreshAccessToken }}>
+    <AuthContext.Provider
+      value={{
+        accessToken: accessTokenQuery.data,
+        userInfo: userInfo, // Update the value here
+        signOut,
+        signIn,
+        register,
+        refreshAccessToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

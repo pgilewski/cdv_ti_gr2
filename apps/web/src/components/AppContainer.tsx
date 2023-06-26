@@ -41,7 +41,7 @@ export const AppContainer = () => {
       asideOffsetBreakpoint="sm"
       navbar={
         <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
-          <SidebarElement to="/">Strona główna</SidebarElement>
+          {/* <SidebarElement to="/">Strona główna</SidebarElement> */}
           <SidebarElement to="/daily">Rejestr dzienny</SidebarElement>
           <SidebarElement to="/monthly">Rejestr miesięczny</SidebarElement>
           <SidebarElement to="/users">Użytkownicy</SidebarElement>

@@ -9,20 +9,21 @@ export type UserInfoType = {
 };
 
 export interface AuthContextProps {
-  accessToken?: string;
-  userInfo: UserInfoType | null;
-  refreshAccessToken: () => Promise<{ statusCode?: number; message?: string }>;
+  accessToken?: string | null;
+  userInfo?: UserInfoType | null;
+  refreshAccessToken: () => Promise<void>;
   signOut: () => void;
-  signIn: (email: string, password: string) => Promise<{ statusCode?: number; message?: string }>;
-  register: (email: string, password: string) => Promise<{ statusCode?: number; message?: string }>;
+  signIn: (email: string, password: string) => Promise<UserInfoType | null | undefined>;
+  register: (email: string, password: string) => Promise<number | undefined>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
+  accessToken: null,
   userInfo: null,
-  refreshAccessToken: () => Promise.resolve({}),
+  refreshAccessToken: () => Promise.resolve(),
   signOut: () => 0,
-  signIn: () => Promise.resolve({}),
-  register: () => Promise.resolve({}),
+  signIn: () => Promise.resolve(null),
+  register: () => Promise.resolve(0),
 });
 
 export default AuthContext;

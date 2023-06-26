@@ -10,7 +10,7 @@ type ReviewDayButtonProps = {
   reviewed?: boolean;
   canEdit: boolean;
   workDay: WorkDay | undefined;
-  userInfo: UserInfoType | null;
+  userInfo?: UserInfoType | null;
 };
 
 const ReviewDayButton = ({ reviewed, canEdit, workDay, userInfo }: ReviewDayButtonProps) => {

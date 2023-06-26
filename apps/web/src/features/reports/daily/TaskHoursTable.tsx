@@ -9,7 +9,7 @@ import { AddTaskHoursModal } from './AddTaskHours';
 
 type DailyTable = {
   data: WorkDay;
-  userInfo: UserInfoType | null;
+  userInfo?: UserInfoType | null;
 };
 
 const BinIcon = () => {

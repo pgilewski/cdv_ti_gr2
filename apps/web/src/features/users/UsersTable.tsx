@@ -56,7 +56,7 @@ export default function UsersTable() {
   };
 
   const onEditUser = (userId: number) => {
-    const userToEdit = users.find((user) => user.id === userId);
+    const userToEdit = users?.find((user) => user.id === userId);
     if (userToEdit) {
       setActiveUserId(String(userId));
       reset({
@@ -67,6 +67,7 @@ export default function UsersTable() {
       });
     }
   };
+
   // const [value, setValue] = useStat<string | null>(null);
   const selectOptions = [
     { value: 'Pracownik', label: 'Pracownik' },

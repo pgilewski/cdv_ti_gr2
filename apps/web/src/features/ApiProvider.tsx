@@ -15,19 +15,38 @@ export function useApi() {
 }
 
 export function ApiProvider({ children }: any) {
-  const { accessToken } = useAuth(); // <--- get accessToken from AuthContext
+  const { accessToken, refreshAccessToken } = useAuth(); // <--- get accessToken from AuthContext
 
   useEffect(() => {
-    // Add the request interceptor
-    console.log('accessToken', accessToken);
-    if (accessToken !== undefined)
-      api.interceptors.request.use((config) => {
+    const requestInterceptor = api.interceptors.request.use((config) => {
+      if (accessToken !== null && accessToken !== undefined) {
         config.headers['Authorization'] = `Bearer ${accessToken}`;
-        console.log(accessToken);
+      }
+      return config;
+    });
 
-        return config;
-      });
-  }, [accessToken]); // <--- re-run the effect when accessToken changes
+    return () => {
+      api.interceptors.request.eject(requestInterceptor);
+    };
+  }, [accessToken]);
+
+  useEffect(() => {
+    const responseInterceptor = api.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        if (error.response?.status === 401) {
+          await refreshAccessToken();
+          // Retry the original request with the new access token
+          return api.request(error.config);
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      api.interceptors.response.eject(responseInterceptor);
+    };
+  }, [refreshAccessToken]);
 
   return <ApiContext.Provider value={api}>{children}</ApiContext.Provider>;
 }
