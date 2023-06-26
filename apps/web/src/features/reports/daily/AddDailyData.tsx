@@ -55,7 +55,7 @@ const AddDailyData = ({
       <ButtonWithLoading
         loading={createWorkDayMutation.isLoading}
         type={'button'}
-        text={'Start day'}
+        text={'Zacznij dzień'}
         disabled={createWorkDayMutation.isLoading}
         key={'start-day'}
         onClick={createWorkDay}

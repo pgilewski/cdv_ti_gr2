@@ -99,8 +99,8 @@ export default function MonthlyPage() {
           <Flex justify={'space-between'}>
             <div></div>
             <MonthPickerInput
-              label="Pick date"
-              placeholder="Pick date"
+              label="Wybierz miesiąc"
+              placeholder="Wybierz miesiąc"
               value={inputMonth}
               onChange={setInputMonth}
               mx="auto"

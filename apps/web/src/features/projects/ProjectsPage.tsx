@@ -229,7 +229,7 @@ export default function ProjectsPage() {
 
           {activeProjectId && (
             <Col span={12}>
-              <Title order={3}>Tasks {projects.find((project) => project.id === activeProjectId)?.title}</Title>
+              <Title order={3}>Taski {projects.find((project) => project.id === activeProjectId)?.title}</Title>
 
               <Table>
                 <thead>{ths}</thead>

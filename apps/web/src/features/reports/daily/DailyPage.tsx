@@ -61,7 +61,7 @@ export default function DailyPage() {
 
   return (
     <div>
-      <Title>Daily raport</Title>
+      <Title>Rejestr dzienny</Title>
       <Grid>
         <Grid.Col span="auto">
           <Flex mt={'auto'}>

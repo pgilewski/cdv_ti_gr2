@@ -42,7 +42,7 @@ const ReviewDayButton = ({ reviewed, canEdit, workDay, userInfo }: ReviewDayButt
       disabled={!canEdit}
       onClick={handleClick}
     >
-      {reviewed ? 'Reviewed' : 'Not reviewed'}
+      {reviewed ? 'Zatwierdzone' : 'Nie zatwierdzone'}
     </Button>
   );
 };
