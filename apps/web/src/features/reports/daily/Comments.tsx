@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Flex, Textarea, Button, Card, Select, Badge } from '@mantine/core';
 import dayjs from 'dayjs';
 import styled from '@emotion/styled';
-import { Comment, workDay } from '../../../typings/types';
+import { Comment, WorkDay } from '../../../typings/types';
 import useCommentsManagement from '../../../hooks/useCommentsManagement';
 import { NotyfContext } from '../../../hooks/useNotyf';
 import { useQueryClient } from 'react-query';
@@ -54,8 +54,9 @@ const SingleComment = ({ comment, handleDeleteComment }: SingleCommentProps) => 
     }
   };
 
-  const handleDelete = () => {
-    handleDeleteComment(comment.id);
+  const handleDelete = (commentId: number) => {
+    console.log(commentId);
+    handleDeleteComment(commentId);
   };
 
   return (
@@ -75,7 +76,7 @@ const SingleComment = ({ comment, handleDeleteComment }: SingleCommentProps) => 
       </Flex>
       <CommentContent color={getCommentTypeColor(comment.type)}>{comment.content}</CommentContent>
       <CommentButtonContainer>
-        <Button size="xs" variant="outline" color="red" onClick={handleDelete}>
+        <Button size="xs" variant="outline" color="red" onClick={() => handleDelete(comment.id)}>
           Usuń
         </Button>
       </CommentButtonContainer>
@@ -84,7 +85,7 @@ const SingleComment = ({ comment, handleDeleteComment }: SingleCommentProps) => 
 };
 
 interface CommentsProps {
-  data: workDay;
+  data: WorkDay;
 }
 
 const Comments = ({ data }: CommentsProps) => {
@@ -100,8 +101,8 @@ const Comments = ({ data }: CommentsProps) => {
     workDayId: data.id,
     userId: data.userId,
   };
+
   const [newComment, setNewComment] = useState<Comment>(defaultCommentState);
-  const [comments, setComments] = useState<Comment[]>(data.comments || []);
 
   const handleCommentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewComment((prevComment) => ({ ...prevComment, content: event.target.value }));
@@ -146,7 +147,7 @@ const Comments = ({ data }: CommentsProps) => {
   };
 
   const handleDeleteComment = (id: number) => {
-    setComments((prevComments) => prevComments.filter((comment) => comment.id !== id));
+    // setComments((prevComments) => prevComments.filter((comment) => comment.id !== id));
 
     try {
       deleteCommentMutation.mutate(id, {
@@ -162,10 +163,6 @@ const Comments = ({ data }: CommentsProps) => {
       console.error('Error creating comment:', error);
     }
   };
-
-  useEffect(() => {
-    setComments(data.comments || []);
-  }, [data.comments]);
 
   return (
     <div>
@@ -192,10 +189,10 @@ const Comments = ({ data }: CommentsProps) => {
           Dodaj komentarz
         </Button>
       </Flex>
-      {comments.length > 0 && (
+      {data.comments.length > 0 && (
         <Card shadow="xs" padding="md" mt="md">
           <strong>Komentarze:</strong>
-          {comments.map((comment) => (
+          {data.comments.map((comment) => (
             <SingleComment key={comment.id} comment={comment} handleDeleteComment={handleDeleteComment} />
           ))}
         </Card>
