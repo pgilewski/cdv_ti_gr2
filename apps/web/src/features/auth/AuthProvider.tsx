@@ -54,6 +54,7 @@ const AuthProvider = ({ children }: { children: any }) => {
         const data: decodedJwt = jwtDecode(accessToken);
         setUserInfo({ ...data, id: userId });
         console.log(userInfo);
+        navigate('/app');
       }
     } catch (error) {
       console.error('Failed to refresh access token:', error);

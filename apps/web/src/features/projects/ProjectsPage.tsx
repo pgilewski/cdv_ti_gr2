@@ -22,6 +22,7 @@ import { useQueryClient } from 'react-query';
 import useProjectManagement from '../../hooks/useProjectManagement';
 import useTaskManagement from '../../hooks/useTaskManagement';
 import { NotyfContext } from '../../hooks/useNotyf';
+import LoadingState from '../../components/LoadingState';
 
 export default function ProjectsPage() {
   const notyf = useContext(NotyfContext);
@@ -183,6 +184,10 @@ export default function ProjectsPage() {
     }
   };
   console.log(activeProjectId);
+
+  if (!projects) {
+    return <LoadingState />;
+  }
   return (
     <div>
       <Title mb="md">Projekty i taski</Title>

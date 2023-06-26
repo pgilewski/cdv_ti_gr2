@@ -18,22 +18,8 @@ import { useFetchUserIdByEmail } from '../../../hooks/useUserFromEmail';
 import useWorkDaySearchParams from '../../../hooks/useWorkdaySearchParams';
 import { NotyfContext } from '../../../hooks/useNotyf';
 import RoleBasedRender from '../../../components/RoleBasedRender';
-
-function useDebounce(value: string, delay: number) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
+import { useDebounce } from '../../../hooks/useDebounce';
+import LoadingState from '../../../components/LoadingState';
 
 export default function DailyPage() {
   const [emailInput, setEmailInput] = useState<string>('');
@@ -113,9 +99,7 @@ export default function DailyPage() {
 
       <Flex justify={'center'} direction={'column'}>
         {workDayQuery.isLoading ? (
-          <Flex justify={'center'}>
-            <RotatingLines strokeColor="grey" strokeWidth="5" animationDuration="0.75" width="25" visible={true} />
-          </Flex>
+          <LoadingState />
         ) : workDayQuery.data ? (
           <>
             <TaskHoursTable data={workDayQuery.data} userInfo={userInfo} />

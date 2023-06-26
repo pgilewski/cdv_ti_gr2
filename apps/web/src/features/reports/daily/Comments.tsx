@@ -166,14 +166,18 @@ const Comments = ({ data }: CommentsProps) => {
 
   return (
     <div>
-      <Textarea
-        placeholder="Treść komentarza..."
-        label="Dodaj komentarz"
-        withAsterisk
-        value={newComment.content}
-        onChange={handleCommentChange}
-      />
-      <Flex justify="center" align="center" style={{ marginTop: '10px', marginBottom: '10px' }}>
+      <Flex>
+        <Textarea
+          miw={'600px'}
+          placeholder="Treść komentarza..."
+          label="Dodaj komentarz"
+          withAsterisk
+          value={newComment.content}
+          onChange={handleCommentChange}
+        />
+      </Flex>
+
+      <Flex align="center" style={{ marginTop: '10px', marginBottom: '10px' }}>
         <Select
           data={[
             { label: 'Warning', value: CommentType.Warning },

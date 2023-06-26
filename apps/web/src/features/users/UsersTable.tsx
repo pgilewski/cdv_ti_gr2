@@ -8,6 +8,7 @@ import ReactSelect from 'react-select';
 import RoleBasedRender from '../../components/RoleBasedRender';
 import { Role } from '../../typings/types';
 import useAuth from '../../hooks/useAuth';
+import LoadingState from '../../components/LoadingState';
 
 export default function UsersTable() {
   const notyf = useContext(NotyfContext);
@@ -23,9 +24,7 @@ export default function UsersTable() {
   const queryClient = useQueryClient();
   const { userInfo } = useAuth();
   console.log(users);
-  if (!users) {
-    return null;
-  }
+
   const onUserSubmit = (data: any) => {
     if (activeUserId) {
       updateUserMutation.mutate(
@@ -74,6 +73,9 @@ export default function UsersTable() {
     { value: 'Moderator', label: 'Moderator' },
     { value: 'Administrator', label: 'Administrator' },
   ];
+  if (!users) {
+    return <LoadingState />;
+  }
   return (
     <Container>
       <RoleBasedRender allowedRoles={[Role.Administrator, Role.Moderator]} userRole={userInfo?.role}>
