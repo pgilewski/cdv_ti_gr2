@@ -27,7 +27,7 @@ export const useMonthlyData = ({ userId, month }: MonthlyDataQueryParams): UseQu
   }
 
   if (month) {
-    queryParams.day = month;
+    queryParams.month = month;
   }
 
   const queryString = new URLSearchParams(queryParams).toString();
