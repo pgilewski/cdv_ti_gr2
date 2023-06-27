@@ -192,7 +192,13 @@ export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModa
               />
             </div>
             <div>
-              <TextInput id="note" placeholder="Co robiles..." label="Note" {...register('note')} autoComplete="off" />
+              <TextInput
+                id="note"
+                placeholder="Co robił_ś..."
+                label="Notatka"
+                {...register('note')}
+                autoComplete="off"
+              />
             </div>
           </SelectInputContainer>
           <button type="submit">Wyślij</button>
