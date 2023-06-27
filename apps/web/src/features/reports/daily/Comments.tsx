@@ -37,10 +37,12 @@ const CommentAuthor = styled.div`
 
 interface SingleCommentProps {
   comment: Comment;
-  handleDeleteComment: (id: number) => void;
 }
 
-const SingleComment = ({ comment, handleDeleteComment }: SingleCommentProps) => {
+const SingleComment = ({ comment }: SingleCommentProps) => {
+  const notyf = useContext(NotyfContext);
+  const queryClient = useQueryClient();
+
   const getCommentTypeColor = (type: string) => {
     switch (type) {
       case CommentType.Warning:
@@ -54,11 +56,15 @@ const SingleComment = ({ comment, handleDeleteComment }: SingleCommentProps) => 
     }
   };
 
-  const handleDelete = (commentId: number) => {
-    console.log(commentId);
-    handleDeleteComment(commentId);
+  const { deleteCommentMutation } = useCommentsManagement();
+  const handleDeleteComment = (comment: Comment) => {
+    console.log(comment, 'comment');
+    try {
+      deleteCommentMutation.mutate(comment.id);
+    } catch (error) {
+      console.error('Error creating comment:', error);
+    }
   };
-
   return (
     <CommentContainer>
       <Flex justify={'space-between'}>
@@ -76,7 +82,7 @@ const SingleComment = ({ comment, handleDeleteComment }: SingleCommentProps) => 
       </Flex>
       <CommentContent color={getCommentTypeColor(comment.type)}>{comment.content}</CommentContent>
       <CommentButtonContainer>
-        <Button size="xs" variant="outline" color="red" onClick={() => handleDelete(comment.id)}>
+        <Button size="xs" variant="outline" color="red" onClick={() => handleDeleteComment(comment)}>
           Usuń
         </Button>
       </CommentButtonContainer>
@@ -146,24 +152,6 @@ const Comments = ({ data }: CommentsProps) => {
     });
   };
 
-  const handleDeleteComment = (id: number) => {
-    // setComments((prevComments) => prevComments.filter((comment) => comment.id !== id));
-
-    try {
-      deleteCommentMutation.mutate(id, {
-        onSuccess: () => {
-          notyf.success('Comment deleted successfully!');
-          queryClient.invalidateQueries(['workDay', data.userId, data.id]);
-        },
-        onError: (error) => {
-          notyf.error('An error occurred while deleting the comment!');
-        },
-      });
-    } catch (error) {
-      console.error('Error creating comment:', error);
-    }
-  };
-
   return (
     <div>
       <Flex>
@@ -197,7 +185,7 @@ const Comments = ({ data }: CommentsProps) => {
         <Card shadow="xs" padding="md" mt="md">
           <strong>Komentarze:</strong>
           {data.comments.map((comment) => (
-            <SingleComment key={comment.id} comment={comment} handleDeleteComment={handleDeleteComment} />
+            <SingleComment key={comment.id} comment={comment} />
           ))}
         </Card>
       )}
