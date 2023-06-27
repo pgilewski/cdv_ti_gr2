@@ -64,7 +64,7 @@ export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModa
     return response.data;
   });
 
-  const { createTaskHourMutation } = useTaskHourManagement();
+  const { createTaskHourMutation } = useTaskHourManagement(workDay);
 
   const queryClient = useQueryClient();
 
@@ -81,9 +81,16 @@ export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModa
 
     console.log(payload);
     try {
-      const createTaskHourResponse = await createTaskHourMutation.mutate(payload);
+      const createTaskHourResponse = await createTaskHourMutation.mutate(payload, {
+        onSuccess: (data) => {
+          queryClient.invalidateQueries(['workDay', userId, day]);
+        },
+        onError: () => {
+          console.error('Error creating work day');
+        },
+      });
       onClose();
-      queryClient.invalidateQueries(['workDay', userId, day]);
+
       // notyf.success("")
     } catch (error) {
       notyf.error('Nie mozna dodac czasu pracy.');
@@ -140,7 +147,7 @@ export const AddTaskHoursModal = ({ isOpen, onClose, workDay }: AddTaskHoursModa
               />
             </div>
             <div>
-              <label htmlFor="endDate">Godzina zakończenia:</label>
+              Dodaj godziny
               <Controller
                 name="endDate"
                 control={control}

@@ -1,3 +1,4 @@
+import { ChangeEvent, useState } from 'react';
 import { useMutation, useQuery, UseQueryResult, UseMutationResult } from 'react-query';
 
 import { useApi } from '../features/ApiProvider';
@@ -15,16 +16,22 @@ export type CreateWorkDayDto = {
   date: string;
 };
 
-const useWorkDayManagement = (userInfo?: UserInfoType | null, dayNow?: string) => {
-  const { userId, day } = useWorkDaySearchParams(dayNow);
+const useWorkDayManagement = (dayNow?: string, userId?: string) => {
+  const { day } = useWorkDaySearchParams(dayNow, userId);
   const api = useApi();
 
   const apiUrl = `/reports/daily?userId=${userId}&day=${day}`;
 
-  const workDayQuery = useQuery<WorkDay>(['workDay', userId, day], async () => {
-    const response = await api.get<WorkDay>(apiUrl);
-    return response.data;
-  });
+  const workDayQuery = useQuery<WorkDay>(
+    ['workDay', userId, day],
+    async () => {
+      const response = await api.get<WorkDay>(apiUrl);
+      return response.data;
+    },
+    {
+      enabled: !!userId && !!day,
+    }
+  );
 
   const createWorkDayMutation = useMutation<WorkDay, Error, CreateWorkDayDto>(async (newData) => {
     const response = await api.post<WorkDay>(apiUrl, newData);

@@ -1,12 +1,15 @@
-import { Button, Flex, Table, Text } from '@mantine/core';
+import { Button, Flex, Grid, Table, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useQueryClient } from 'react-query';
 import useTaskHourManagement from '../../../hooks/useTaskHourManagement';
 import { WorkDay } from '../../../typings/types';
+import { UserInfoType } from '../../auth/AuthContext';
 import { formatDate } from '../../utils';
 import { AddTaskHoursModal } from './AddTaskHours';
 
 type DailyTable = {
   data: WorkDay;
+  userInfo?: UserInfoType | null;
 };
 
 const BinIcon = () => {
@@ -55,10 +58,24 @@ const BinIcon = () => {
     </svg>
   );
 };
-const TaskHoursTable = ({ data }: DailyTable) => {
+const TaskHoursTable = ({ data, userInfo }: DailyTable) => {
   const [opened, { open, close }] = useDisclosure(false);
-  const { deleteTaskHourMutation } = useTaskHourManagement();
+  const { deleteTaskHourMutation } = useTaskHourManagement(data);
+  const queryClient = useQueryClient();
+  const deleteTaskHour = (taskHourId: number, data: WorkDay) => {
+    deleteTaskHourMutation.mutate(taskHourId, {
+      onSuccess: () => {
+        console.log(data);
+        console.log('ADsadsad');
+        queryClient.invalidateQueries(['workDay', String(data.userId), data.date]);
+      },
+      onError: () => {
+        console.log('ADsadsad');
 
+        console.error('Error creating work day');
+      },
+    });
+  };
   const ths = (
     <tr>
       <th>Start</th>
@@ -81,7 +98,7 @@ const TaskHoursTable = ({ data }: DailyTable) => {
           <td>{taskHour.note}</td>
           <td>{taskHour.task.project.title}</td>
           <td>
-            <span onClick={() => deleteTaskHourMutation.mutate(taskHour.id)}>
+            <span onClick={() => deleteTaskHour(taskHour.id, data)}>
               <BinIcon />
             </span>
           </td>
@@ -90,21 +107,40 @@ const TaskHoursTable = ({ data }: DailyTable) => {
     : null;
   return (
     <Flex direction={'column'} justify={'center'}>
-      <Flex>
-        <Text size="lg" weight={600}>
-          Ostatnio aktualizowane:
-        </Text>
-        <Text ml={'4px'} size="lg">
-          {formatDate(data.updatedAt)}
-        </Text>
+      <Flex justify={'space-between'}>
+        {/* <Flex>
+          <Text size="lg" weight={600}>
+            Ostatnio aktualizowane:
+          </Text>
+          <Text ml={'4px'} size="lg">
+            {formatDate(data.updatedAt)}
+          </Text>
+        </Flex> */}
       </Flex>
       <AddTaskHoursModal workDay={data} isOpen={opened} onClose={close} />
 
-      <Flex justify={'center'}>
-        <Button color="blue" onClick={open}>
-          Dodaj godziny
-        </Button>
-      </Flex>
+      <Grid>
+        <Grid.Col span="auto">
+          {data.userId !== userInfo?.id ? (
+            <>
+              <Text size="md">Konto {data.user.email}</Text>
+            </>
+          ) : null}
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <Flex justify={'center'}>
+            <Button color="blue" onClick={open}>
+              Dodaj godziny
+            </Button>
+          </Flex>
+        </Grid.Col>
+        <Grid.Col span="auto">
+          <Text ml={'auto'} size="md" align="end">
+            Ostatnio aktualizowane: {formatDate(data.updatedAt)}
+          </Text>
+        </Grid.Col>
+        <div></div>{' '}
+      </Grid>
 
       <Table highlightOnHover>
         <caption></caption>

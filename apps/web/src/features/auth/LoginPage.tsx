@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import useAuth from '../../hooks/useAuth';
 
@@ -6,11 +6,11 @@ import { Text, Card, Button, TextInput } from '@mantine/core';
 import styled from '@emotion/styled';
 import { useForm } from 'react-hook-form';
 import { NotyfContext } from '../../hooks/useNotyf';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContainer } from './AuthStyles';
 
 const LoginPage = () => {
-  const { signIn } = useAuth();
+  const { userInfo, accessToken, signIn } = useAuth();
   const notyf = useContext(NotyfContext);
 
   const {
@@ -23,11 +23,19 @@ const LoginPage = () => {
   const onSubmit = async ({ email, password }: { email: string; password: string }) => {
     try {
       const loginResponse = await signIn(email, password);
+      console.log(loginResponse);
     } catch (error) {
       notyf.error('Nie udało się zalogować.');
     }
   };
+  // const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   if (userInfo && accessToken) {
+  //     notyf.success('Zalogowano pomyślnie');
+  //     // navigate('/app');
+  //   }
+  // }, [userInfo, accessToken]);
   return (
     <AuthContainer>
       <Card shadow="sm" padding="xl">

@@ -65,22 +65,22 @@ export interface TaskHour {
 
 export interface Comment {
   id: number;
-  createdAt: Date | string;
-  updatedAt: Date | string;
+  createdAt: string;
+  updatedAt: string;
   content: string;
   type: string; // warning | error | ok
-  workdayId: number;
-  workday: WorkDay;
+  workDayId: number;
+  workDay?: WorkDay;
   userId: number;
-  user: User;
+  user?: User;
 }
 
 export interface WorkDay {
   id: number;
   userId: number;
-  date: string | Date;
-  createdAt: string | Date;
-  updatedAt: string | Date;
+  date: string;
+  createdAt: string;
+  updatedAt: string;
   isReviewed: boolean;
   reviewedBy: number | null;
   taskHours?: TaskHour[];

@@ -1,8 +1,8 @@
-import { Flex, Grid, Title } from '@mantine/core';
+import { Autocomplete, Button, Flex, Grid, Input, Paper, Text, Title } from '@mantine/core';
 
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { WorkDay } from '../../../typings/types';
+import { Role, WorkDay } from '../../../typings/types';
 import { ChangeDayNavbar } from '../ChangeDayNavbar';
 import ReviewDayButton from '../ReviewDayButton';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -14,28 +14,74 @@ import TaskHoursTable from './TaskHoursTable';
 import AddDailyData from './AddDailyData';
 import { RotatingLines } from 'react-loader-spinner';
 import Comments from './Comments';
+import { useFetchUserIdByEmail } from '../../../hooks/useUserFromEmail';
+import useWorkDaySearchParams from '../../../hooks/useWorkdaySearchParams';
+import { NotyfContext } from '../../../hooks/useNotyf';
+import RoleBasedRender from '../../../components/RoleBasedRender';
+import { useDebounce } from '../../../hooks/useDebounce';
+import LoadingState from '../../../components/LoadingState';
 
 export default function DailyPage() {
-  const dayNow = dayjs().format('YYYY-MM-DD');
+  const [emailInput, setEmailInput] = useState<string>('');
+  const debouncedEmailInput = useDebounce(emailInput, 300); // debounce by 500ms
+
+  const { usersOptions, isLoading: logTypesLoading } = useFetchUserIdByEmail(debouncedEmailInput);
+
+  const [date, setDate] = useState<Date | null>(new Date());
+
+  // const dayNow = dayjs().format('YYYY-MM-DD');
   const { userInfo } = useAuth();
   // const params = useParams<DailyPageParams>();
   const [searchParams] = useSearchParams();
-  const userId = searchParams.get('user') || String(userInfo?.id);
-  const day = searchParams.get('day') || dayNow;
-  console.log(userId, day);
+  const { userId, day } = useWorkDaySearchParams();
+
+  const [selectedUserId, setSelectedUserId] = useState<string | undefined>();
+  const notyf = useContext(NotyfContext);
+
   const { workDayQuery, createWorkDayMutation, updateWorkDayMutation, deleteWorkDayMutation } = useWorkDayManagement(
-    userInfo,
-    dayNow
+    day,
+    selectedUserId !== undefined ? selectedUserId : userId
   );
 
-  const [date, setDate] = useState<Date | null>(new Date());
+  const userSearch = () => {
+    const selectedUser = usersOptions.find((user) => {
+      console.log(user.value, emailInput);
+
+      return user.value === emailInput;
+    });
+    console.log(selectedUser, emailInput);
+
+    if (selectedUser) {
+      setSelectedUserId(String(selectedUser.id));
+      console.log(String(selectedUser.id));
+    } else {
+      notyf.error('Nie udało się wybrać uzytkownika');
+    }
+  };
 
   return (
     <div>
       <Title>Rejestr dzienny</Title>
-      <Grid m="0">
-        <Grid.Col span="auto">{/* <RaportOwnerHeading /> */}</Grid.Col>
-        <Grid.Col span={6}>
+      <Grid>
+        <Grid.Col span="auto">
+          <Flex mt={'auto'}>
+            {' '}
+            <RoleBasedRender allowedRoles={[Role.Administrator, Role.Moderator]} userRole={userInfo?.role}>
+              <Flex>
+                <Autocomplete
+                  data={usersOptions}
+                  placeholder="Enter email"
+                  value={emailInput}
+                  onChange={setEmailInput}
+                />
+                <Button mx="sm" onClick={userSearch}>
+                  Wyszukaj
+                </Button>
+              </Flex>
+            </RoleBasedRender>
+          </Flex>
+        </Grid.Col>
+        <Grid.Col span={4}>
           <ChangeDayNavbar date={date} setDate={setDate} />
         </Grid.Col>
 
@@ -53,21 +99,16 @@ export default function DailyPage() {
 
       <Flex justify={'center'} direction={'column'}>
         {workDayQuery.isLoading ? (
-          <Flex justify={'center'}>
-            <RotatingLines strokeColor="grey" strokeWidth="5" animationDuration="0.75" width="25" visible={true} />
-          </Flex>
+          <LoadingState />
         ) : workDayQuery.data ? (
           <>
-            <TaskHoursTable data={workDayQuery.data} />
+            <TaskHoursTable data={workDayQuery.data} userInfo={userInfo} />
             <Comments data={workDayQuery.data} />
           </>
         ) : (
           <AddDailyData createWorkDayMutation={createWorkDayMutation} date={day} userId={userId} />
         )}
       </Flex>
-
-      {/* <DailyTable setTable={setTable} data={dailyData} /> */}
     </div>
   );
 }
-const DailyBody = {};

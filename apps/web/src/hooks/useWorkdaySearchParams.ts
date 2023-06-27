@@ -7,16 +7,17 @@ type WorkDaySearchParams = {
   day: string;
 };
 
-const useWorkDaySearchParams = (controlledDate?: string): WorkDaySearchParams => {
+const useWorkDaySearchParams = (controlledDate?: string, userId?: string): WorkDaySearchParams => {
   const [searchParams] = useSearchParams();
   const { userInfo } = useAuth();
   const [params, setParams] = useState<WorkDaySearchParams>({ userId: '', day: '' });
 
   useEffect(() => {
-    const userId = searchParams.get('user') || String(userInfo?.id);
-    const day = searchParams.get('day') || controlledDate || new Date().toISOString();
-    setParams({ userId, day });
-  }, [searchParams, userInfo, controlledDate]);
+    const resolvedUserId = userId || searchParams.get('user') || String(userInfo?.id);
+    const day = controlledDate || searchParams.get('day') || new Date().toISOString().slice(0, 10);
+    setParams({ userId: resolvedUserId, day });
+    console.log({ userId: resolvedUserId, day });
+  }, [searchParams, userInfo, controlledDate, userId]);
 
   return params;
 };

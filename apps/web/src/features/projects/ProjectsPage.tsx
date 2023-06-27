@@ -22,6 +22,7 @@ import { useQueryClient } from 'react-query';
 import useProjectManagement from '../../hooks/useProjectManagement';
 import useTaskManagement from '../../hooks/useTaskManagement';
 import { NotyfContext } from '../../hooks/useNotyf';
+import LoadingState from '../../components/LoadingState';
 
 export default function ProjectsPage() {
   const notyf = useContext(NotyfContext);
@@ -56,9 +57,6 @@ export default function ProjectsPage() {
     </tr>
   );
 
-  if (!projects) {
-    return null;
-  }
   const deleteProject = (id: number) => {
     deleteProjectMutation.mutate(id, {
       onSuccess: () => {
@@ -72,7 +70,7 @@ export default function ProjectsPage() {
   };
 
   const onViewProject = (projectId: number) => {
-    if (!tasks) return null;
+    if (!tasks || !projects) return null;
 
     const projectToEdit = projects.find((task) => task.id === projectId);
     if (projectToEdit) {
@@ -85,7 +83,7 @@ export default function ProjectsPage() {
     // setActiveProjectId(projectId);
   };
 
-  const rows = projects.map((project) => (
+  const rows = projects?.map((project) => (
     <tr key={project.id}>
       <th>{project.title}</th>
       <th>{project.description}</th>
@@ -183,6 +181,10 @@ export default function ProjectsPage() {
     }
   };
   console.log(activeProjectId);
+
+  if (!projects || !tasks) {
+    return <LoadingState />;
+  }
   return (
     <div>
       <Title mb="md">Projekty i taski</Title>

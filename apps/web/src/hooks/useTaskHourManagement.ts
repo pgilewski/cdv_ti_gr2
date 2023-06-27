@@ -18,37 +18,20 @@ export type CreateTaskHourDto = {
   note?: string;
 };
 
-const useTaskHourManagement = () => {
+const useTaskHourManagement = (workDay: WorkDay) => {
   const api = useApi();
   const queryClient = useQueryClient();
 
-  const apiUrlAdd = `/task-hour/add`;
-  const apiUrlDelete = (id: number) => `/task-hour/${id}`;
-
   const { userId, day } = useWorkDaySearchParams();
 
-  const createTaskHourMutation = useMutation<TaskHour, Error, CreateTaskHourDto>(
-    async (newData) => {
-      const response = await api.post<TaskHour>(apiUrlAdd, newData);
-      return response.data;
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['workDay', userId, day]);
-      },
-    }
-  );
+  const createTaskHourMutation = useMutation<TaskHour, Error, CreateTaskHourDto>(async (newData) => {
+    const response = await api.post<TaskHour>(`/task-hour/add`, newData);
+    return response.data;
+  });
 
-  const deleteTaskHourMutation = useMutation<void, Error, number>(
-    async (id) => {
-      await api.delete(apiUrlDelete(id));
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['workDay', userId, day]);
-      },
-    }
-  );
+  const deleteTaskHourMutation = useMutation<void, Error, number>(async (id) => {
+    await api.delete(`/task-hour/${id}`);
+  });
 
   return {
     createTaskHourMutation,
